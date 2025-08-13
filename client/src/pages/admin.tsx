@@ -16,7 +16,7 @@ export default function Admin() {
   const handleAuth = (e: React.FormEvent) => {
     e.preventDefault();
     // Simple password check for demo - in production use proper auth
-    if (password === "admin123") {
+    if (password === "Gisobot201415*") {
       setIsAuthenticated(true);
     } else {
       alert("Noto'g'ri parol");

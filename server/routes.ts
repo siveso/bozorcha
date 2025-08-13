@@ -9,7 +9,7 @@ import { z } from "zod";
 // Simple auth middleware for admin routes
 const adminAuth = (req: any, res: any, next: any) => {
   const authHeader = req.headers.authorization;
-  if (authHeader === "Bearer bozorcha-admin-token-2024") {
+  if (authHeader === "Bearer Gisobot201415*") {
     next();
   } else {
     res.status(401).json({ message: "Unauthorized" });
