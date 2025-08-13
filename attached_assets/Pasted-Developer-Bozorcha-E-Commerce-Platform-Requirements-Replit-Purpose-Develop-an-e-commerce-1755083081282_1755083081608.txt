@@ -1,0 +1,91 @@
+Developer: # Bozorcha E-Commerce Platform Requirements (Replit)
+
+## Purpose
+Develop an e-commerce website named "Bozorcha" on the Replit platform with high SEO performance and advanced blog management features.
+
+Begin with a concise checklist (3-7 bullets) of what you will do; keep items conceptual, not implementation-level.
+
+## Functional Requirements
+1. **SEO Optimization:**
+   - Ensure site structure, meta fields, sitemaps, and rich snippets (e.g., JSON-LD, Open Graph tags) support full search engine indexing and optimal ranking.
+   - Auto-generate SEO structured data for all product and blog post pages.
+
+2. **Blog Post Management:**
+   - Admin panel must allow manual and automated creation, editing, and deletion of blog posts.
+   - Provide bulk processing options for posts.
+
+3. **Trending Analysis & Automated Content:**
+   - Integrate Gemini 1.5 Flash API for daily internal trend analysis.
+   - Auto-publish 10–12 blog posts per day based on trend results.
+
+4. **Admin Operations:**
+   - Manual and automatic blog post functionality, including publish, edit, and delete from the admin interface.
+
+## Data Structure Standards
+
+### Blog Post (JSON)
+```json
+{
+  "id": "string",
+  "title": "string",
+  "content": "string",
+  "tags": ["string"],
+  "trending_keywords": ["string"],
+  "created_by": "admin | auto",
+  "date": "ISO8601 string",
+  "status": "draft | published | error"
+}
+```
+
+### Product Listing (JSON)
+```json
+{
+  "id": "string",
+  "name": "string",
+  "description": "string",
+  "price": "number",
+  "category": "string",
+  "images": ["url string"],
+  "stock": "integer",
+  "seo": {
+    "meta_title": "string",
+    "meta_description": "string",
+    "keywords": ["string"]
+  }
+}
+```
+
+### Trend Analysis Result - Gemini 1.5 Flash API (JSON)
+```json
+{
+  "date": "YYYY-MM-DD",
+  "trends": [
+    {
+      "keyword": "string",
+      "score": "number"
+    }
+  ]
+}
+```
+
+## Admin Panel API Examples
+- **Manual Blog Post Creation:**
+  - `POST /posts` with Blog Post structure as payload.
+- **Automated Post Generation:**
+  - Task triggered by Gemini API results; response:
+    ```json
+    {
+      "generated": 12,
+      "success": 12,
+      "failed": 0,
+      "errors": []
+    }
+    ```
+
+## SEO Structured Data
+Auto-generate Open Graph, meta tags, and JSON-LD schema.org structured data for all product and blog post pages.
+
+## Output Format & Expectations
+- Use provided JSON structures for blog posts, product listings, and trend analysis results in all relevant operations and API requests/responses.
+- Ensure admin panel actions are RESTful and use clear input/output formats.
+- Set reasoning_effort = medium due to moderate architectural complexity; keep tool calls and lists terse, final deliverables complete.
