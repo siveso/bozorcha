@@ -2,6 +2,7 @@ import {
   products,
   blogPosts,
   categories,
+  orders,
   trendAnalysis,
   users,
   type Product,
@@ -10,6 +11,8 @@ import {
   type InsertBlogPost,
   type Category,
   type InsertCategory,
+  type Order,
+  type InsertOrder,
   type TrendAnalysis,
   type InsertTrendAnalysis,
   type User,
@@ -37,6 +40,19 @@ export interface IStorage {
   // Categories
   getCategories(): Promise<Category[]>;
   createCategory(category: InsertCategory): Promise<Category>;
+  updateCategory(id: string, category: Partial<InsertCategory>): Promise<Category | undefined>;
+  deleteCategory(id: string): Promise<boolean>;
+
+  // Orders
+  getOrders(filters?: {
+    status?: string;
+    limit?: number;
+    offset?: number;
+  }): Promise<{ orders: Order[]; total: number }>;
+  getOrder(id: string): Promise<Order | undefined>;
+  createOrder(order: InsertOrder): Promise<Order>;
+  updateOrderStatus(id: string, status: string): Promise<Order | undefined>;
+  deleteOrder(id: string): Promise<boolean>;
 
   // Blog Posts
   getBlogPosts(filters?: {
@@ -306,6 +322,7 @@ export class MemoryStorage implements IStorage {
   private products: Product[] = [];
   private blogPosts: BlogPost[] = [];
   private categories: Category[] = [];
+  private orders: Order[] = [];
   private trendAnalyses: TrendAnalysis[] = [];
   private users: User[] = [];
   private nextId = 1;
@@ -584,6 +601,87 @@ export class MemoryStorage implements IStorage {
     };
     this.categories.push(newCategory);
     return newCategory;
+  }
+
+  async updateCategory(id: string, category: Partial<InsertCategory>): Promise<Category | undefined> {
+    const index = this.categories.findIndex(c => c.id === id);
+    if (index === -1) return undefined;
+
+    this.categories[index] = {
+      ...this.categories[index],
+      ...category,
+    };
+    return this.categories[index];
+  }
+
+  async deleteCategory(id: string): Promise<boolean> {
+    const index = this.categories.findIndex(c => c.id === id);
+    if (index === -1) return false;
+
+    this.categories[index].isActive = false;
+    return true;
+  }
+
+  // Orders
+  async getOrders(filters: {
+    status?: string;
+    limit?: number;
+    offset?: number;
+  } = {}): Promise<{ orders: Order[]; total: number }> {
+    const { status, limit = 50, offset = 0 } = filters;
+
+    let filtered = [...this.orders];
+
+    if (status) {
+      filtered = filtered.filter(o => o.status === status);
+    }
+
+    filtered.sort((a, b) => new Date(b.createdAt!).getTime() - new Date(a.createdAt!).getTime());
+
+    const total = filtered.length;
+    const orders = filtered.slice(offset, offset + limit);
+
+    return { orders, total };
+  }
+
+  async getOrder(id: string): Promise<Order | undefined> {
+    return this.orders.find(o => o.id === id);
+  }
+
+  async createOrder(order: InsertOrder): Promise<Order> {
+    const now = new Date();
+    const orderNumber = `BZ${Date.now().toString().slice(-6)}${Math.random().toString(36).substr(2, 3).toUpperCase()}`;
+    
+    const newOrder: Order = {
+      ...order,
+      id: this.generateId(),
+      orderNumber,
+      createdAt: now,
+      updatedAt: now,
+      status: order.status || "pending",
+    };
+    this.orders.push(newOrder);
+    return newOrder;
+  }
+
+  async updateOrderStatus(id: string, status: string): Promise<Order | undefined> {
+    const index = this.orders.findIndex(o => o.id === id);
+    if (index === -1) return undefined;
+
+    this.orders[index] = {
+      ...this.orders[index],
+      status,
+      updatedAt: new Date(),
+    };
+    return this.orders[index];
+  }
+
+  async deleteOrder(id: string): Promise<boolean> {
+    const index = this.orders.findIndex(o => o.id === id);
+    if (index === -1) return false;
+
+    this.orders.splice(index, 1);
+    return true;
   }
 
   // Blog Posts

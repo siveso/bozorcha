@@ -40,18 +40,39 @@ export default function Cart() {
     
     try {
       const orderData = {
-        items: cart,
-        total,
-        customer: orderForm,
-        orderDate: new Date().toISOString()
+        customerName: orderForm.name,
+        customerPhone: orderForm.phone,
+        customerEmail: orderForm.email,
+        customerAddress: orderForm.address,
+        notes: orderForm.notes,
+        items: cart.map(item => ({
+          id: item.id,
+          name: item.name,
+          price: item.price,
+          quantity: item.quantity,
+          category: item.category
+        })),
+        totalAmount: total.toString()
       };
 
-      // Simulate API call - replace with real endpoint
-      await new Promise(resolve => setTimeout(resolve, 1500));
+      // Send to API
+      const response = await fetch('/api/orders', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify(orderData)
+      });
+
+      if (!response.ok) {
+        throw new Error('Order submission failed');
+      }
+
+      const createdOrder = await response.json();
       
       toast({
         title: "Buyurtma muvaffaqiyatli qabul qilindi!",
-        description: `Buyurtma raqami: #${Math.random().toString(36).substr(2, 9).toUpperCase()}. Tez orada siz bilan bog'lanamiz.`,
+        description: `Buyurtma raqami: #${createdOrder.orderNumber}. Tez orada siz bilan bog'lanamiz.`,
       });
 
       clearCart();

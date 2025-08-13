@@ -70,6 +70,32 @@ export const categories = pgTable("categories", {
   createdAt: timestamp("created_at").defaultNow(),
 });
 
+// Orders table
+export const orders = pgTable("orders", {
+  id: varchar("id").primaryKey().default(sql`gen_random_uuid()`),
+  orderNumber: varchar("order_number").notNull().unique(),
+  customerName: text("customer_name").notNull(),
+  customerPhone: text("customer_phone").notNull(),
+  customerEmail: text("customer_email"),
+  customerAddress: text("customer_address").notNull(),
+  notes: text("notes"),
+  items: jsonb("items").$type<Array<{
+    id: string;
+    name: string;
+    price: string;
+    quantity: number;
+    category: string;
+  }>>().notNull(),
+  totalAmount: decimal("total_amount", { precision: 10, scale: 2 }).notNull(),
+  status: varchar("status").notNull().default("pending"), // "pending" | "confirmed" | "processing" | "shipped" | "delivered" | "cancelled"
+  createdAt: timestamp("created_at").defaultNow(),
+  updatedAt: timestamp("updated_at").defaultNow(),
+}, (table) => [
+  index("idx_orders_status").on(table.status),
+  index("idx_orders_created").on(table.createdAt),
+  index("idx_orders_customer_phone").on(table.customerPhone),
+]);
+
 // Trend analysis results table
 export const trendAnalysis = pgTable("trend_analysis", {
   id: varchar("id").primaryKey().default(sql`gen_random_uuid()`),
@@ -134,6 +160,13 @@ export const insertUserSchema = createInsertSchema(users).omit({
   createdAt: true,
 });
 
+// Insert schemas
+export const insertOrderSchema = createInsertSchema(orders).omit({
+  id: true,
+  createdAt: true,
+  updatedAt: true,
+});
+
 // Types
 export type Product = typeof products.$inferSelect;
 export type InsertProduct = z.infer<typeof insertProductSchema>;
@@ -143,6 +176,9 @@ export type InsertBlogPost = z.infer<typeof insertBlogPostSchema>;
 
 export type Category = typeof categories.$inferSelect;
 export type InsertCategory = z.infer<typeof insertCategorySchema>;
+
+export type Order = typeof orders.$inferSelect;
+export type InsertOrder = z.infer<typeof insertOrderSchema>;
 
 export type TrendAnalysis = typeof trendAnalysis.$inferSelect;
 export type InsertTrendAnalysis = z.infer<typeof insertTrendAnalysisSchema>;
