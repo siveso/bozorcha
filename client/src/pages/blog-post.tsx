@@ -36,6 +36,16 @@ export default function BlogPostPage() {
     enabled: !!post,
   });
 
+  // Get SEO data for blog post - always call this hook
+  const { data: seoData } = useQuery({
+    queryKey: ["/api/seo/blog", postId],
+    queryFn: async () => {
+      const response = await fetch(`/api/seo/blog/${postId}`);
+      return await response.json();
+    },
+    enabled: !!postId && !!post,
+  });
+
   const formatDate = (dateString: string) => {
     return new Date(dateString).toLocaleDateString('uz-UZ', {
       year: 'numeric',
@@ -95,16 +105,6 @@ export default function BlogPostPage() {
     );
   }
 
-  // Get SEO data for blog post
-  const { data: seoData } = useQuery({
-    queryKey: ["/api/seo/blog", postId],
-    queryFn: async () => {
-      const response = await fetch(`/api/seo/blog/${postId}`);
-      return await response.json();
-    },
-    enabled: !!postId && !!post,
-  });
-
   return (
     <>
       {seoData && <SeoHead metadata={seoData} />}
@@ -124,7 +124,7 @@ export default function BlogPostPage() {
             {/* Header */}
             <div className="p-8 border-b border-gray-200">
               <div className="flex flex-wrap gap-2 mb-4">
-                {post.tags.map((tag, index) => (
+                {post.tags.map((tag: string, index: number) => (
                   <Badge key={index} variant="secondary" data-testid={`tag-${index}`}>
                     #{tag}
                   </Badge>
@@ -179,13 +179,13 @@ export default function BlogPostPage() {
             </div>
 
             {/* Trending Keywords */}
-            {post.trendingKeywords.length > 0 && (
+            {post.trendingKeywords && post.trendingKeywords.length > 0 && (
               <div className="p-8 border-t border-gray-200 bg-gray-50">
-                <h3 className="font-semibold text-gray-900 mb-3">Trend mavzular</h3>
+                <h3 className="text-lg font-semibold text-gray-900 mb-4">Trend so'zlar</h3>
                 <div className="flex flex-wrap gap-2">
-                  {post.trendingKeywords.map((keyword, index) => (
-                    <Badge key={index} variant="outline" className="bg-white" data-testid={`trend-keyword-${index}`}>
-                      🔥 {keyword}
+                  {post.trendingKeywords.map((keyword: string, index: number) => (
+                    <Badge key={index} variant="outline" data-testid={`trending-keyword-${index}`}>
+                      {keyword}
                     </Badge>
                   ))}
                 </div>
@@ -194,38 +194,22 @@ export default function BlogPostPage() {
           </article>
 
           {/* Related Posts */}
-          {relatedPosts?.posts?.length > 0 && (
-            <section className="mt-16">
-              <h2 className="text-2xl font-bold text-gray-900 mb-8">O'xshash maqolalar</h2>
-              <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
+          {relatedPosts && relatedPosts.posts && relatedPosts.posts.length > 0 && (
+            <section className="mt-12">
+              <h2 className="text-2xl font-bold text-gray-900 mb-6">Aloqador maqolalar</h2>
+              <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
                 {relatedPosts.posts
                   .filter((relatedPost: BlogPost) => relatedPost.id !== post.id)
                   .slice(0, 3)
                   .map((relatedPost: BlogPost) => (
-                    <BlogCard key={relatedPost.id} post={relatedPost} />
+                    <BlogCard
+                      key={relatedPost.id}
+                      post={relatedPost}
+                    />
                   ))}
               </div>
             </section>
           )}
-
-          {/* Call to Action */}
-          <section className="mt-16">
-            <Card className="bg-gradient-to-r from-primary to-blue-700 text-white">
-              <CardContent className="p-8 text-center">
-                <h2 className="text-2xl font-bold mb-4">
-                  Ko'proq foydali maqolalar
-                </h2>
-                <p className="text-blue-100 mb-6">
-                  Xarid qilish va mahsulotlar haqida yangi maslahatlarni bilib oling
-                </p>
-                <Link href="/blog">
-                  <Button variant="secondary" className="bg-white text-primary hover:bg-gray-100">
-                    Blogni ko'rish
-                  </Button>
-                </Link>
-              </CardContent>
-            </Card>
-          </section>
         </div>
       </div>
     </>
