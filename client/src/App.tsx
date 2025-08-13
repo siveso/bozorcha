@@ -12,6 +12,7 @@ import Blog from "@/pages/blog";
 import BlogPost from "@/pages/blog-post";
 import Contact from "@/pages/contact";
 import Profile from "@/pages/profile";
+import Cart from "@/pages/cart";
 import NotFound from "@/pages/not-found";
 
 function Router() {
@@ -24,6 +25,7 @@ function Router() {
       <Route path="/blog/:id" component={BlogPost} />
       <Route path="/contact" component={Contact} />
       <Route path="/profile" component={Profile} />
+      <Route path="/cart" component={Cart} />
       <Route component={NotFound} />
     </Switch>
   );

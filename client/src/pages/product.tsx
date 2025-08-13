@@ -1,18 +1,25 @@
+import { useState } from "react";
 import { useParams } from "wouter";
 import { useQuery } from "@tanstack/react-query";
 import { Header } from "@/components/header";
-import { SeoHead } from "@/components/seo/SeoHead";
+import { SeoHead } from "@/components/seo/seo-head-simple";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Skeleton } from "@/components/ui/skeleton";
-import { ShoppingCart, Heart, Share2, Star } from "lucide-react";
+import { ShoppingCart, Heart, Share2, Star, Play } from "lucide-react";
 import { Link } from "wouter";
-import type { Product } from "@shared/schema";
+import { useCart } from "@/components/cart-context";
+import { useWishlist } from "@/components/wishlist-context";
+import { useToast } from "@/hooks/use-toast";
 
 export default function ProductPage() {
   const params = useParams();
   const productId = params.id;
+  const [selectedImageIndex, setSelectedImageIndex] = useState(0);
+  const { addToCart } = useCart();
+  const { addToWishlist, isInWishlist } = useWishlist();
+  const { toast } = useToast();
 
   const { data: product, isLoading, error } = useQuery({
     queryKey: ["/api/products", productId],
@@ -30,7 +37,7 @@ export default function ProductPage() {
     return new Intl.NumberFormat('uz-UZ', {
       style: 'decimal',
       minimumFractionDigits: 0,
-    }).format(Number(price));
+    }).format(Number(price.replace(/[^\d]/g, "")));
   };
 
   const renderStars = (rating: string) => {
@@ -48,13 +55,28 @@ export default function ProductPage() {
   };
 
   const handleAddToCart = () => {
-    console.log("Added to cart:", product?.name);
-    // TODO: Implement cart functionality
+    if (product) {
+      addToCart(product);
+      toast({
+        title: "Savatchaga qo'shildi",
+        description: `${product.name} savatchaga qo'shildi`
+      });
+    }
   };
 
   const handleAddToWishlist = () => {
-    console.log("Added to wishlist:", product?.name);
-    // TODO: Implement wishlist functionality
+    if (product) {
+      addToWishlist(product);
+      toast({
+        title: "Sevimlilarga qo'shildi",
+        description: `${product.name} sevimlilar ro'yxatiga qo'shildi`
+      });
+    }
+  };
+
+  const getYouTubeVideoId = (url: string) => {
+    const match = url.match(/(?:youtube\.com\/watch\?v=|youtu\.be\/)([^&\n?#]+)/);
+    return match ? match[1] : null;
   };
 
   const handleShare = () => {
@@ -66,7 +88,10 @@ export default function ProductPage() {
       });
     } else {
       navigator.clipboard.writeText(window.location.href);
-      // TODO: Show toast notification
+      toast({
+        title: "Link nusxalandi",
+        description: "Mahsulot linki vaqtinchalik xotiraga nusxalandi"
+      });
     }
   };
 
@@ -89,23 +114,13 @@ export default function ProductPage() {
     );
   }
 
-  // Get SEO data - always call this hook before conditional returns
-  const { data: seoData } = useQuery({
-    queryKey: ["/api/seo/product", productId],
-    queryFn: async () => {
-      const response = await fetch(`/api/seo/product/${productId}`);
-      return await response.json();
-    },
-    enabled: !!productId && !!product,
-  });
-
   if (isLoading) {
     return (
       <>
         <Header />
         <div className="min-h-screen bg-gray-50">
-          <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
-            <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
+          <div className="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
+            <div className="grid grid-cols-1 lg:grid-cols-2 gap-12">
               <Skeleton className="aspect-square rounded-lg" />
               <div className="space-y-4">
                 <Skeleton className="h-8 w-3/4" />
@@ -121,61 +136,82 @@ export default function ProductPage() {
     );
   }
 
+  if (!product) return null;
+
+  const videoId = product.youtubeUrl ? getYouTubeVideoId(product.youtubeUrl) : null;
+
   return (
     <>
-      {seoData && <SeoHead metadata={seoData} />}
-      <Header />
+      <SeoHead 
+        title={product.metaTitle || `${product.name} - Bozorcha`}
+        description={product.metaDescription || product.description || ""}
+        keywords={product.keywords || []}
+      />
       <div className="min-h-screen bg-gray-50">
-        {/* Breadcrumb */}
-        <div className="bg-white border-b border-gray-200">
-          <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-4">
-            <nav className="flex items-center space-x-2 text-sm">
-              <Link href="/" className="text-gray-500 hover:text-gray-700">
-                Bosh sahifa
-              </Link>
-              <span className="text-gray-400">/</span>
-              <Link href={`/?category=${product.category}`} className="text-gray-500 hover:text-gray-700">
-                {product.category}
-              </Link>
-              <span className="text-gray-400">/</span>
-              <span className="text-gray-900">{product.name}</span>
-            </nav>
-          </div>
-        </div>
+        <Header />
+        
+        <div className="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
+          <nav className="mb-8">
+            <ol className="flex items-center space-x-2 text-sm text-gray-600">
+              <li><Link href="/" className="hover:text-primary">Bosh sahifa</Link></li>
+              <li className="flex items-center"><span className="mx-2">/</span></li>
+              <li><Link href={`/?category=${product.category}`} className="hover:text-primary">{product.category}</Link></li>
+              <li className="flex items-center"><span className="mx-2">/</span></li>
+              <li className="text-gray-900">{product.name}</li>
+            </ol>
+          </nav>
 
-        {/* Product Details */}
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
           <div className="grid grid-cols-1 lg:grid-cols-2 gap-12">
-            {/* Product Images */}
+            {/* Product Images and Video */}
             <div className="space-y-4">
-              {product.images.length > 0 ? (
-                <div className="aspect-square rounded-lg overflow-hidden bg-white">
-                  <img
-                    src={product.images[0]}
-                    alt={product.name}
-                    className="w-full h-full object-cover"
-                    data-testid="product-main-image"
-                  />
-                </div>
-              ) : (
-                <div className="aspect-square rounded-lg bg-gray-200 flex items-center justify-center">
-                  <span className="text-gray-400">Rasm yo'q</span>
+              {/* Main Image */}
+              <div className="aspect-square bg-gray-200 rounded-lg overflow-hidden">
+                <img 
+                  src={product.images?.[selectedImageIndex] || "/api/placeholder/400/400"} 
+                  alt={product.name}
+                  className="w-full h-full object-cover"
+                />
+              </div>
+              
+              {/* Image Thumbnails */}
+              {product.images && product.images.length > 1 && (
+                <div className="flex space-x-2">
+                  {product.images.map((image, index) => (
+                    <button
+                      key={index}
+                      onClick={() => setSelectedImageIndex(index)}
+                      className={`w-20 h-20 rounded-lg overflow-hidden border-2 ${
+                        selectedImageIndex === index ? 'border-primary' : 'border-gray-200'
+                      }`}
+                    >
+                      <img 
+                        src={image} 
+                        alt={`${product.name} ${index + 1}`}
+                        className="w-full h-full object-cover"
+                      />
+                    </button>
+                  ))}
                 </div>
               )}
 
-              {/* Thumbnail images */}
-              {product.images.length > 1 && (
-                <div className="grid grid-cols-4 gap-2">
-                  {product.images.slice(1, 5).map((image, index) => (
-                    <div key={index} className="aspect-square rounded-lg overflow-hidden bg-white">
-                      <img
-                        src={image}
-                        alt={`${product.name} ${index + 2}`}
-                        className="w-full h-full object-cover hover:scale-105 transition-transform cursor-pointer"
-                        data-testid={`product-thumb-${index}`}
-                      />
-                    </div>
-                  ))}
+              {/* YouTube Video */}
+              {videoId && (
+                <div className="mt-6">
+                  <h3 className="text-lg font-semibold text-gray-900 mb-3 flex items-center">
+                    <Play className="h-5 w-5 mr-2 text-red-600" />
+                    Mahsulot videosi
+                  </h3>
+                  <div className="aspect-video bg-gray-200 rounded-lg overflow-hidden">
+                    <iframe
+                      width="100%"
+                      height="100%"
+                      src={`https://www.youtube.com/embed/${videoId}`}
+                      title="YouTube video player"
+                      frameBorder="0"
+                      allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share"
+                      allowFullScreen
+                    ></iframe>
+                  </div>
                 </div>
               )}
             </div>
@@ -183,114 +219,82 @@ export default function ProductPage() {
             {/* Product Info */}
             <div className="space-y-6">
               <div>
-                <Badge variant="outline" className="mb-2">
+                <Badge variant="secondary" className="mb-2">
                   {product.category}
                 </Badge>
-                <h1 className="text-3xl font-bold text-gray-900 mb-4" data-testid="product-title">
+                <h1 className="text-3xl font-bold text-gray-900 mb-4">
                   {product.name}
                 </h1>
-                <div className="flex items-center gap-4 mb-4">
+                <div className="flex items-center space-x-4 mb-4">
                   <div className="flex items-center">
-                    {renderStars(product.rating)}
+                    {renderStars(product.rating || "0")}
                     <span className="ml-2 text-sm text-gray-600">
                       ({product.reviewCount} baho)
                     </span>
                   </div>
-                  <Button variant="ghost" size="sm" onClick={handleShare} data-testid="share-button">
+                  <Button variant="ghost" size="sm" onClick={handleShare}>
                     <Share2 className="h-4 w-4 mr-1" />
                     Ulashish
                   </Button>
                 </div>
-                <div className="text-4xl font-bold text-primary mb-4" data-testid="product-price">
-                  {formatPrice(product.price)} so'm
-                </div>
-              </div>
-
-              <div>
-                <h3 className="font-semibold text-gray-900 mb-2">Mahsulot haqida</h3>
-                <p className="text-gray-600 leading-relaxed" data-testid="product-description">
+                <p className="text-3xl font-bold text-primary mb-6">
+                  {formatPrice(product.price || "0")} so'm
+                </p>
+                <p className="text-gray-700 text-lg leading-relaxed mb-6">
                   {product.description}
                 </p>
               </div>
 
-              {/* Stock status */}
-              <div>
-                {product.stock > 0 ? (
-                  <div className="flex items-center gap-2">
-                    <div className="w-3 h-3 bg-green-500 rounded-full"></div>
-                    <span className="text-green-600 font-medium">
-                      Omborda mavjud ({product.stock} dona)
-                    </span>
-                  </div>
-                ) : (
-                  <div className="flex items-center gap-2">
-                    <div className="w-3 h-3 bg-red-500 rounded-full"></div>
-                    <span className="text-red-600 font-medium">Omborda yo'q</span>
-                  </div>
-                )}
-              </div>
+              <div className="border-t pt-6">
+                <p className="text-sm text-green-600 mb-4">
+                  <span className="inline-block w-2 h-2 bg-green-500 rounded-full mr-2"></span>
+                  Omborda mavjud ({product.stock} dona)
+                </p>
 
-              {/* Action Buttons */}
-              <div className="space-y-4">
-                <Button
-                  onClick={handleAddToCart}
-                  disabled={product.stock === 0}
-                  className="w-full bg-primary hover:bg-blue-700 text-white py-3 text-lg"
-                  data-testid="add-to-cart-button"
-                >
-                  <ShoppingCart className="h-5 w-5 mr-2" />
-                  {product.stock > 0 ? "Savatga qo'shish" : "Omborda yo'q"}
-                </Button>
-
-                <Button
-                  onClick={handleAddToWishlist}
-                  variant="outline"
-                  className="w-full py-3"
-                  data-testid="add-to-wishlist-button"
-                >
-                  <Heart className="h-5 w-5 mr-2" />
-                  Sevimlilar ro'yxatiga qo'shish
-                </Button>
-              </div>
-
-              {/* Product Features */}
-              <Card>
-                <CardContent className="p-6">
-                  <h3 className="font-semibold text-gray-900 mb-4">Bizning afzalliklar</h3>
-                  <div className="space-y-3">
-                    <div className="flex items-center gap-3">
-                      <div className="w-2 h-2 bg-green-500 rounded-full"></div>
-                      <span className="text-gray-600">Tez va bepul yetkazish</span>
-                    </div>
-                    <div className="flex items-center gap-3">
-                      <div className="w-2 h-2 bg-blue-500 rounded-full"></div>
-                      <span className="text-gray-600">Sifat kafolati</span>
-                    </div>
-                    <div className="flex items-center gap-3">
-                      <div className="w-2 h-2 bg-purple-500 rounded-full"></div>
-                      <span className="text-gray-600">14 kun qaytarish imkoniyati</span>
-                    </div>
-                    <div className="flex items-center gap-3">
-                      <div className="w-2 h-2 bg-orange-500 rounded-full"></div>
-                      <span className="text-gray-600">24/7 mijozlar xizmati</span>
-                    </div>
-                  </div>
-                </CardContent>
-              </Card>
-
-              {/* Keywords */}
-              {product.keywords.length > 0 && (
-                <div>
-                  <h3 className="font-semibold text-gray-900 mb-2">Teglar</h3>
-                  <div className="flex flex-wrap gap-2">
-                    {product.keywords.map((keyword, index) => (
-                      <Badge key={index} variant="secondary" className="text-xs">
-                        #{keyword}
-                      </Badge>
-                    ))}
-                  </div>
+                <div className="flex space-x-4">
+                  <Button 
+                    onClick={handleAddToCart}
+                    className="flex-1 bg-primary text-white px-6 py-3 text-lg hover:bg-blue-700"
+                  >
+                    <ShoppingCart className="h-5 w-5 mr-2" />
+                    Savatga qo'shish
+                  </Button>
+                  <Button 
+                    variant="outline" 
+                    onClick={handleAddToWishlist}
+                    className={`px-6 py-3 text-lg ${
+                      isInWishlist(product.id || '') 
+                        ? 'bg-red-50 text-red-600 border-red-300' 
+                        : ''
+                    }`}
+                  >
+                    <Heart className={`h-5 w-5 ${
+                      isInWishlist(product.id || '') ? 'fill-current' : ''
+                    }`} />
+                  </Button>
                 </div>
-              )}
+              </div>
+
+              {/* Product Benefits */}
+              <div className="border-t pt-6">
+                <h3 className="text-lg font-semibold text-gray-900 mb-4">
+                  Bizning afzalliklar
+                </h3>
+                <ul className="space-y-3 text-gray-700">
+                  <li className="flex items-center">
+                    <span className="w-2 h-2 bg-blue-500 rounded-full mr-3"></span>
+                    Tez va bepul yetkazish
+                  </li>
+                  <li className="flex items-center">
+                    <span className="w-2 h-2 bg-green-500 rounded-full mr-3"></span>
+                    Sifat kafolati
+                  </li>
+                  <li className="flex items-center">
+                    <span className="w-2 h-2 bg-purple-500 rounded-full mr-3"></span>
+                    24/7 qo'llab-quvvatlash
+                  </li>
+                </ul>
+              </div>
             </div>
           </div>
         </div>

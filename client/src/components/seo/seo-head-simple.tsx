@@ -34,7 +34,7 @@ export function SeoHead({ title, description, keywords, ogImage }: SeoHeadProps)
     };
 
     updateMeta("description", description);
-    updateMeta("keywords", keywords.join(", "));
+    updateMeta("keywords", Array.isArray(keywords) ? keywords.join(", ") : "");
     
     // Open Graph tags
     updateProperty("og:title", title);

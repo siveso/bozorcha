@@ -4,12 +4,17 @@ import { Search, Heart, ShoppingCart, User, Menu } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Sheet, SheetContent, SheetTrigger } from "@/components/ui/sheet";
+import { useCart } from "@/components/cart-context";
+import { useWishlist } from "@/components/wishlist-context";
 
 export function Header() {
   const [location, navigate] = useLocation();
   const [searchQuery, setSearchQuery] = useState("");
-  const [cartCount, setCartCount] = useState(0);
-  const [wishlistCount, setWishlistCount] = useState(0);
+  const { getCartItemsCount } = useCart();
+  const { wishlist } = useWishlist();
+  
+  const cartCount = getCartItemsCount();
+  const wishlistCount = wishlist.length;
 
   const handleSearch = () => {
     if (searchQuery.trim()) {
@@ -65,22 +70,26 @@ export function Header() {
 
             {/* User Actions */}
             <div className="flex items-center space-x-4">
-              <Button variant="ghost" size="icon" className="relative" data-testid="wishlist-button">
-                <Heart className="h-5 w-5" />
-                {wishlistCount > 0 && (
-                  <span className="absolute -top-2 -right-2 bg-accent text-white text-xs rounded-full w-5 h-5 flex items-center justify-center">
-                    {wishlistCount}
-                  </span>
-                )}
-              </Button>
-              <Button variant="ghost" size="icon" className="relative" data-testid="cart-button">
-                <ShoppingCart className="h-5 w-5" />
-                {cartCount > 0 && (
-                  <span className="absolute -top-2 -right-2 bg-accent text-white text-xs rounded-full w-5 h-5 flex items-center justify-center">
-                    {cartCount}
-                  </span>
-                )}
-              </Button>
+              <Link href="/profile">
+                <Button variant="ghost" size="icon" className="relative" data-testid="wishlist-button">
+                  <Heart className="h-5 w-5" />
+                  {wishlistCount > 0 && (
+                    <span className="absolute -top-2 -right-2 bg-accent text-white text-xs rounded-full w-5 h-5 flex items-center justify-center">
+                      {wishlistCount}
+                    </span>
+                  )}
+                </Button>
+              </Link>
+              <Link href="/cart">
+                <Button variant="ghost" size="icon" className="relative" data-testid="cart-button">
+                  <ShoppingCart className="h-5 w-5" />
+                  {cartCount > 0 && (
+                    <span className="absolute -top-2 -right-2 bg-accent text-white text-xs rounded-full w-5 h-5 flex items-center justify-center">
+                      {cartCount}
+                    </span>
+                  )}
+                </Button>
+              </Link>
               <Button variant="ghost" size="icon" data-testid="user-button">
                 <User className="h-5 w-5" />
               </Button>

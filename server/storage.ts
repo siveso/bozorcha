@@ -344,7 +344,12 @@ export class MemoryStorage implements IStorage {
         description: "Zamonaviy smartfon yuqori sifat va tezkor ishlash bilan",
         price: "8999000",
         category: "elektronika",
-        images: ["/api/placeholder/400/400"],
+        images: [
+          "/api/placeholder/400/400",
+          "/api/placeholder/400/300", 
+          "/api/placeholder/300/400"
+        ],
+        youtubeUrl: "https://www.youtube.com/watch?v=dQw4w9WgXcQ",
         stock: 15,
         metaTitle: "Samsung Galaxy S24 - Zamonaviy Smartfon | Bozorcha",
         metaDescription: "Samsung Galaxy S24 smartfonini arzon narxda sotib oling. Yuqori sifat, tezkor ishlash va zamonaviy dizayn.",
@@ -361,7 +366,12 @@ export class MemoryStorage implements IStorage {
         description: "Yumshoq va qulay mato bilan tayyorlangan erkaklar uchun zamonaviy ko'ylak",
         price: "189000",
         category: "kiyim-kechak",
-        images: ["/api/placeholder/400/400"],
+        images: [
+          "/api/placeholder/400/400",
+          "/api/placeholder/400/300",
+          "/api/placeholder/300/400"
+        ],
+        youtubeUrl: "https://www.youtube.com/watch?v=example123",
         stock: 25,
         metaTitle: "Erkaklar Zamonaviy Ko'ylagi | Bozorcha",
         metaDescription: "Sifatli va zamonaviy erkaklar ko'ylagini arzon narxda sotib oling.",
@@ -378,7 +388,12 @@ export class MemoryStorage implements IStorage {
         description: "Ishchi va o'quvchilar uchun mukammal noutbuk - tezkor ishlash va uzun batareya umri",
         price: "5499000",
         category: "elektronika",
-        images: ["/api/placeholder/400/400"],
+        images: [
+          "/api/placeholder/400/400",
+          "/api/placeholder/400/300",
+          "/api/placeholder/300/400"
+        ],
+        youtubeUrl: "https://www.youtube.com/watch?v=tech_demo",
         stock: 8,
         metaTitle: "HP Pavilion Noutbuki - Arzon Narx | Bozorcha",
         metaDescription: "HP Pavilion noutbuklarini eng yaxshi narxda sotib oling. Ishchi va talabalar uchun ideal.",
