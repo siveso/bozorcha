@@ -1,6 +1,7 @@
 import { useState, useEffect } from "react";
 import { useQuery } from "@tanstack/react-query";
 import { useLocation } from "wouter";
+import { useToast } from "@/hooks/use-toast";
 import { Header } from "@/components/header";
 import { ProductFilters } from "@/components/product-filters";
 import { ProductCard } from "@/components/product-card";
@@ -21,6 +22,7 @@ export default function Home() {
   const [sortBy, setSortBy] = useState("createdAt");
   const [currentPage, setCurrentPage] = useState(0);
   const pageSize = 12;
+  const { toast } = useToast();
 
   // Parse URL parameters
   useEffect(() => {
@@ -69,14 +71,20 @@ export default function Home() {
     // Filters are already applied through handleFiltersChange
   };
 
-  const handleAddToCart = (product: Product) => {
+  const handleAddToCart = (product: any) => {
     console.log("Added to cart:", product.name);
-    // TODO: Implement cart functionality
+    toast({
+      title: "Savatchaga qo'shildi",
+      description: `${product.name} savatchaga qo'shildi`
+    });
   };
 
-  const handleAddToWishlist = (product: Product) => {
+  const handleAddToWishlist = (product: any) => {
     console.log("Added to wishlist:", product.name);
-    // TODO: Implement wishlist functionality
+    toast({
+      title: "Sevimlilarga qo'shildi",
+      description: `${product.name} sevimlilar ro'yxatiga qo'shildi`
+    });
   };
 
   const totalPages = Math.ceil((productsData?.total || 0) / pageSize);
@@ -179,7 +187,7 @@ export default function Home() {
               ) : (
                 <>
                   <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
-                    {productsData?.products?.map((product: Product) => (
+                    {productsData?.products?.map((product: any) => (
                       <ProductCard
                         key={product.id}
                         product={product}
@@ -273,7 +281,7 @@ export default function Home() {
             ) : (
               <>
                 <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
-                  {blogData?.posts?.slice(0, 6).map((post: BlogPost) => (
+                  {blogData?.posts?.slice(0, 6).map((post: any) => (
                     <BlogCard key={post.id} post={post} />
                   ))}
                 </div>

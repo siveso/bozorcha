@@ -39,7 +39,7 @@ export function ProductManagement() {
     queryFn: async () => {
       const params = new URLSearchParams();
       if (searchQuery) params.append("search", searchQuery);
-      if (categoryFilter) params.append("category", categoryFilter);
+      if (categoryFilter && categoryFilter !== "all") params.append("category", categoryFilter);
       
       const response = await fetch(`/api/products?${params}`, {
         headers: { Authorization: ADMIN_TOKEN }
@@ -294,7 +294,7 @@ export function ProductManagement() {
                 <SelectValue placeholder="Barcha kategoriyalar" />
               </SelectTrigger>
               <SelectContent>
-                <SelectItem value="">Barcha kategoriyalar</SelectItem>
+                <SelectItem value="all">Barcha kategoriyalar</SelectItem>
                 <SelectItem value="elektronika">Elektronika</SelectItem>
                 <SelectItem value="kiyim">Kiyim</SelectItem>
                 <SelectItem value="uy-jihozlari">Uy jihozlari</SelectItem>

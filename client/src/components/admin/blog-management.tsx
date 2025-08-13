@@ -36,7 +36,7 @@ export function BlogManagement() {
     queryKey: ["/api/admin/blog", statusFilter],
     queryFn: async () => {
       const params = new URLSearchParams();
-      if (statusFilter) params.append("status", statusFilter);
+      if (statusFilter && statusFilter !== "all") params.append("status", statusFilter);
       
       const response = await fetch(`/api/admin/blog?${params}`, {
         headers: { Authorization: ADMIN_TOKEN }
@@ -305,7 +305,7 @@ export function BlogManagement() {
               <SelectValue placeholder="Barcha holatlar" />
             </SelectTrigger>
             <SelectContent>
-              <SelectItem value="">Barcha holatlar</SelectItem>
+              <SelectItem value="all">Barcha holatlar</SelectItem>
               <SelectItem value="draft">Qoralama</SelectItem>
               <SelectItem value="published">Nashr qilingan</SelectItem>
             </SelectContent>
