@@ -7,6 +7,8 @@ Bozorcha is a modern e-commerce platform built with React and Express.js, design
 ## User Preferences
 
 Preferred communication style: Simple, everyday language.
+User language: Uzbek (responds in Uzbek language)
+Communication preference: Direct and action-oriented responses
 
 ## System Architecture
 
