@@ -2,15 +2,14 @@ import { useParams } from "wouter";
 import { useQuery } from "@tanstack/react-query";
 import { Header } from "@/components/header";
 import { BlogCard } from "@/components/blog-card";
-import { SEOHead } from "@/components/seo-head";
+import { SeoHead } from "@/components/seo/SeoHead";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Skeleton } from "@/components/ui/skeleton";
 import { ArrowLeft, Calendar, Clock, User, Share2 } from "lucide-react";
-import { generateBlogPostSEO } from "@/lib/seo";
 import { Link } from "wouter";
-import type { BlogPost } from "@/types";
+import type { BlogPost } from "@shared/schema";
 
 export default function BlogPostPage() {
   const params = useParams();
@@ -96,11 +95,19 @@ export default function BlogPostPage() {
     );
   }
 
-  const seoData = generateBlogPostSEO(post as BlogPost);
+  // Get SEO data for blog post
+  const { data: seoData } = useQuery({
+    queryKey: ["/api/seo/blog", postId],
+    queryFn: async () => {
+      const response = await fetch(`/api/seo/blog/${postId}`);
+      return await response.json();
+    },
+    enabled: !!postId && !!post,
+  });
 
   return (
     <>
-      <SEOHead seo={seoData} />
+      {seoData && <SeoHead metadata={seoData} />}
       <Header />
       <div className="min-h-screen bg-gray-50">
         <div className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 py-8">

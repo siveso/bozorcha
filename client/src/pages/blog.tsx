@@ -2,14 +2,14 @@ import { useState } from "react";
 import { useQuery } from "@tanstack/react-query";
 import { Header } from "@/components/header";
 import { BlogCard } from "@/components/blog-card";
-import { SEOHead } from "@/components/seo-head";
+import { SeoHead } from "@/components/seo/SeoHead";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Card } from "@/components/ui/card";
 import { Skeleton } from "@/components/ui/skeleton";
 import { Search, BookOpen } from "lucide-react";
-import type { BlogPost } from "@/types";
+import type { BlogPost } from "@shared/schema";
 
 export default function BlogPage() {
   const [searchQuery, setSearchQuery] = useState("");
@@ -40,7 +40,7 @@ export default function BlogPage() {
   const seoData = {
     title: "Blog - Bozorcha",
     description: "Xarid qilish, mahsulotlar va texnologiya haqida foydali maqolalar. Bozorcha blogida eng so'nggi yangiliklar va maslahatlarni o'qing.",
-    keywords: "blog, maqolalar, xarid maslahatlar, mahsulot sharhlari, texnologiya yangiliklari",
+    keywords: ["blog", "maqolalar", "xarid maslahatlar", "mahsulot sharhlari", "texnologiya yangiliklari"],
     ogTitle: "Blog - Bozorcha",
     ogDescription: "Foydali maqolalar va maslahatlar Bozorcha blogida",
     structuredData: {
@@ -48,7 +48,7 @@ export default function BlogPage() {
       "@type": "Blog",
       "name": "Bozorcha Blog",
       "description": "Xarid qilish va mahsulotlar haqida foydali maqolalar",
-      "url": window.location.href,
+      "url": typeof window !== 'undefined' ? window.location.href : '',
       "publisher": {
         "@type": "Organization",
         "name": "Bozorcha"
@@ -58,7 +58,7 @@ export default function BlogPage() {
 
   return (
     <>
-      <SEOHead seo={seoData} />
+      <SeoHead metadata={seoData} />
       <Header />
       <div className="min-h-screen bg-gray-50">
         {/* Hero Section */}

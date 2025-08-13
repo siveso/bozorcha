@@ -4,9 +4,10 @@ import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { ProductManagement } from "@/components/admin/product-management";
 import { BlogManagement } from "@/components/admin/blog-management";
 import { TrendAnalysisComponent } from "@/components/admin/trend-analysis";
+import { SeoAnalyzer } from "@/components/seo/SeoAnalyzer";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
-import { Box, Newspaper, TrendingUp, Settings } from "lucide-react";
+import { Box, Newspaper, TrendingUp, Search } from "lucide-react";
 
 export default function Admin() {
   const [isAuthenticated, setIsAuthenticated] = useState(false);
@@ -77,7 +78,7 @@ export default function Admin() {
       {/* Admin Content */}
       <div className="p-6">
         <Tabs defaultValue="products" className="w-full">
-          <TabsList className="grid w-full grid-cols-3">
+          <TabsList className="grid w-full grid-cols-4">
             <TabsTrigger value="products" className="flex items-center gap-2" data-testid="products-tab">
               <Box className="h-4 w-4" />
               Mahsulotlar
@@ -89,6 +90,10 @@ export default function Admin() {
             <TabsTrigger value="trends" className="flex items-center gap-2" data-testid="trends-tab">
               <TrendingUp className="h-4 w-4" />
               Trend tahlil
+            </TabsTrigger>
+            <TabsTrigger value="seo" className="flex items-center gap-2" data-testid="seo-tab">
+              <Search className="h-4 w-4" />
+              SEO Tahlil
             </TabsTrigger>
           </TabsList>
 
@@ -102,6 +107,10 @@ export default function Admin() {
 
           <TabsContent value="trends" className="mt-6">
             <TrendAnalysisComponent />
+          </TabsContent>
+
+          <TabsContent value="seo" className="mt-6">
+            <SeoAnalyzer />
           </TabsContent>
         </Tabs>
       </div>

@@ -2,6 +2,7 @@ import type { Express } from "express";
 import { createServer, type Server } from "http";
 import { storage } from "./storage";
 import { geminiService } from "./services/gemini";
+import { seoService } from "./services/seo";
 import { insertProductSchema, insertBlogPostSchema, insertCategorySchema } from "@shared/schema";
 import { z } from "zod";
 
@@ -276,6 +277,97 @@ export async function registerRoutes(app: Express): Promise<Server> {
     } catch (error) {
       console.error("Error fetching trend analysis:", error);
       res.status(500).json({ message: "Failed to fetch trend analysis" });
+    }
+  });
+
+  // SEO Routes
+
+  // Get SEO metadata for a product
+  app.get("/api/seo/product/:id", async (req, res) => {
+    try {
+      const product = await storage.getProduct(req.params.id);
+      if (!product) {
+        return res.status(404).json({ message: "Product not found" });
+      }
+      const seoData = seoService.generateProductSeo(product);
+      res.json(seoData);
+    } catch (error) {
+      console.error("Error generating product SEO:", error);
+      res.status(500).json({ message: "Failed to generate SEO data" });
+    }
+  });
+
+  // Get SEO metadata for a blog post
+  app.get("/api/seo/blog/:id", async (req, res) => {
+    try {
+      const post = await storage.getBlogPost(req.params.id);
+      if (!post) {
+        return res.status(404).json({ message: "Blog post not found" });
+      }
+      const seoData = seoService.generateBlogSeo(post);
+      res.json(seoData);
+    } catch (error) {
+      console.error("Error generating blog SEO:", error);
+      res.status(500).json({ message: "Failed to generate SEO data" });
+    }
+  });
+
+  // Get SEO metadata for homepage
+  app.get("/api/seo/homepage", async (req, res) => {
+    try {
+      const products = await storage.getProducts({ limit: 1000 });
+      const categories = await storage.getCategories();
+      const seoData = seoService.generateHomepageSeo(products.total, categories.length);
+      res.json(seoData);
+    } catch (error) {
+      console.error("Error generating homepage SEO:", error);
+      res.status(500).json({ message: "Failed to generate SEO data" });
+    }
+  });
+
+  // Generate XML sitemap
+  app.get("/sitemap.xml", async (req, res) => {
+    try {
+      const products = await storage.getProducts({ limit: 10000 });
+      const blogPosts = await storage.getBlogPosts({ status: "published", limit: 10000 });
+      const categories = await storage.getCategories();
+      
+      const sitemap = seoService.generateSitemap(products.products, blogPosts.posts, categories);
+      
+      res.setHeader('Content-Type', 'application/xml');
+      res.send(sitemap);
+    } catch (error) {
+      console.error("Error generating sitemap:", error);
+      res.status(500).send("Error generating sitemap");
+    }
+  });
+
+  // Generate robots.txt
+  app.get("/robots.txt", (req, res) => {
+    try {
+      const robots = seoService.generateRobotsTxt();
+      res.setHeader('Content-Type', 'text/plain');
+      res.send(robots);
+    } catch (error) {
+      console.error("Error generating robots.txt:", error);
+      res.status(500).send("Error generating robots.txt");
+    }
+  });
+
+  // Admin SEO analysis
+  app.post("/api/admin/seo/analyze", adminAuth, async (req, res) => {
+    try {
+      const { content, metadata } = req.body;
+      
+      if (!content || !metadata) {
+        return res.status(400).json({ message: "Content and metadata are required" });
+      }
+
+      const analysis = seoService.analyzePage(content, metadata);
+      res.json(analysis);
+    } catch (error) {
+      console.error("Error analyzing SEO:", error);
+      res.status(500).json({ message: "Failed to analyze SEO" });
     }
   });
 

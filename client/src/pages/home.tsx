@@ -5,16 +5,15 @@ import { Header } from "@/components/header";
 import { ProductFilters } from "@/components/product-filters";
 import { ProductCard } from "@/components/product-card";
 import { BlogCard } from "@/components/blog-card";
-import { SEOHead } from "@/components/seo-head";
+import { SeoHead } from "@/components/seo/SeoHead";
 import { Button } from "@/components/ui/button";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Card, CardContent } from "@/components/ui/card";
 import { Skeleton } from "@/components/ui/skeleton";
 import { ShoppingBag, Truck, Shield, Award, Headphones } from "lucide-react";
-import { generateHomeSEO } from "@/lib/seo";
 import { Link } from "wouter";
-import type { Product, BlogPost } from "@/types";
-import type { ProductFilters as ProductFiltersType } from "@/types";
+import type { Product, BlogPost } from "@shared/schema";
+import type { ProductFilters as ProductFiltersType } from "@/types/filters";
 
 export default function Home() {
   const [location] = useLocation();
@@ -82,11 +81,18 @@ export default function Home() {
 
   const totalPages = Math.ceil((productsData?.total || 0) / pageSize);
 
-  const seoData = generateHomeSEO();
+  // Get SEO data for homepage
+  const { data: seoData } = useQuery({
+    queryKey: ["/api/seo/homepage"],
+    queryFn: async () => {
+      const response = await fetch("/api/seo/homepage");
+      return await response.json();
+    },
+  });
 
   return (
     <>
-      <SEOHead seo={seoData} />
+      {seoData && <SeoHead metadata={seoData} />}
       <div className="min-h-screen bg-gray-50">
         <Header />
 

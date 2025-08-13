@@ -1,15 +1,14 @@
 import { useParams } from "wouter";
 import { useQuery } from "@tanstack/react-query";
 import { Header } from "@/components/header";
-import { SEOHead } from "@/components/seo-head";
+import { SeoHead } from "@/components/seo/SeoHead";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Skeleton } from "@/components/ui/skeleton";
 import { ShoppingCart, Heart, Share2, Star } from "lucide-react";
-import { generateProductSEO } from "@/lib/seo";
 import { Link } from "wouter";
-import type { Product } from "@/types";
+import type { Product } from "@shared/schema";
 
 export default function ProductPage() {
   const params = useParams();
@@ -112,11 +111,19 @@ export default function ProductPage() {
     );
   }
 
-  const seoData = generateProductSEO(product as Product);
+  // Get SEO data
+  const { data: seoData } = useQuery({
+    queryKey: ["/api/seo/product", productId],
+    queryFn: async () => {
+      const response = await fetch(`/api/seo/product/${productId}`);
+      return await response.json();
+    },
+    enabled: !!productId && !!product,
+  });
 
   return (
     <>
-      <SEOHead seo={seoData} />
+      {seoData && <SeoHead metadata={seoData} />}
       <Header />
       <div className="min-h-screen bg-gray-50">
         {/* Breadcrumb */}
