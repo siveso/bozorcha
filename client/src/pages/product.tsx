@@ -89,6 +89,16 @@ export default function ProductPage() {
     );
   }
 
+  // Get SEO data - always call this hook before conditional returns
+  const { data: seoData } = useQuery({
+    queryKey: ["/api/seo/product", productId],
+    queryFn: async () => {
+      const response = await fetch(`/api/seo/product/${productId}`);
+      return await response.json();
+    },
+    enabled: !!productId && !!product,
+  });
+
   if (isLoading) {
     return (
       <>
@@ -110,16 +120,6 @@ export default function ProductPage() {
       </>
     );
   }
-
-  // Get SEO data
-  const { data: seoData } = useQuery({
-    queryKey: ["/api/seo/product", productId],
-    queryFn: async () => {
-      const response = await fetch(`/api/seo/product/${productId}`);
-      return await response.json();
-    },
-    enabled: !!productId && !!product,
-  });
 
   return (
     <>
