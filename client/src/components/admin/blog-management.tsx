@@ -5,7 +5,7 @@ import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
-import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from "@/components/ui/dialog";
+import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle, DialogTrigger } from "@/components/ui/dialog";
 import { Badge } from "@/components/ui/badge";
 import { Plus, Edit, Trash2, Bot } from "lucide-react";
 import { useToast } from "@/hooks/use-toast";
@@ -197,6 +197,9 @@ export function BlogManagement() {
                 <DialogTitle>
                   {editingPost ? "Blog postni tahrirlash" : "Yangi blog post"}
                 </DialogTitle>
+                <DialogDescription>
+                  {editingPost ? "Blog post ma'lumotlarini yangilang" : "Yangi blog post ma'lumotlarini kiriting"}
+                </DialogDescription>
               </DialogHeader>
               <form onSubmit={handleSubmit} className="space-y-4">
                 <div className="grid grid-cols-2 gap-4">

@@ -39,14 +39,14 @@ export function SeoHead({ metadata }: SeoHeadProps) {
 
     // Create meta tags
     const metaTags = [
-      { name: 'description', content: metadata.description },
-      { name: 'keywords', content: metadata.keywords.join(', ') },
+      { name: 'description', content: metadata.description || '' },
+      { name: 'keywords', content: Array.isArray(metadata.keywords) ? metadata.keywords.join(', ') : metadata.keywords || '' },
       { property: 'og:title', content: metadata.ogTitle || metadata.title },
-      { property: 'og:description', content: metadata.ogDescription || metadata.description },
+      { property: 'og:description', content: metadata.ogDescription || metadata.description || '' },
       { property: 'og:type', content: metadata.ogType || 'website' },
       { name: 'twitter:card', content: metadata.twitterCard || 'summary' },
       { name: 'twitter:title', content: metadata.twitterTitle || metadata.title },
-      { name: 'twitter:description', content: metadata.twitterDescription || metadata.description },
+      { name: 'twitter:description', content: metadata.twitterDescription || metadata.description || '' },
     ];
 
     // Add optional meta tags
