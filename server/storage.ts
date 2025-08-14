@@ -315,6 +315,79 @@ export class DatabaseStorage implements IStorage {
     const [created] = await db.insert(users).values(user).returning();
     return created;
   }
+
+  // Categories
+  async updateCategory(id: string, category: Partial<InsertCategory>): Promise<Category | undefined> {
+    const [updated] = await db
+      .update(categories)
+      .set(category)
+      .where(eq(categories.id, id))
+      .returning();
+    return updated;
+  }
+
+  async deleteCategory(id: string): Promise<boolean> {
+    const result = await db.delete(categories).where(eq(categories.id, id));
+    return (result.rowCount ?? 0) > 0;
+  }
+
+  // Orders
+  async getOrders(filters: {
+    status?: string;
+    limit?: number;
+    offset?: number;
+  } = {}): Promise<{ orders: Order[]; total: number }> {
+    const { status, limit = 20, offset = 0 } = filters;
+
+    let query = db.select().from(orders);
+    let countQuery = db.select({ count: sql<number>`count(*)` }).from(orders);
+
+    if (status) {
+      query = query.where(eq(orders.status, status));
+      countQuery = countQuery.where(eq(orders.status, status));
+    }
+
+    const [results, totalResults] = await Promise.all([
+      query.orderBy(desc(orders.createdAt)).limit(limit).offset(offset),
+      countQuery,
+    ]);
+
+    return {
+      orders: results,
+      total: totalResults[0]?.count ?? 0,
+    };
+  }
+
+  async getOrder(id: string): Promise<Order | undefined> {
+    const [order] = await db.select().from(orders).where(eq(orders.id, id));
+    return order;
+  }
+
+  async createOrder(order: InsertOrder): Promise<Order> {
+    const orderData = {
+      ...order,
+      id: `ord_${Date.now()}_${Math.random().toString(36).substr(2, 9)}`,
+      orderNumber: `ORD-${Date.now()}`,
+      createdAt: new Date(),
+      updatedAt: new Date(),
+    };
+    const [created] = await db.insert(orders).values(orderData).returning();
+    return created;
+  }
+
+  async updateOrderStatus(id: string, status: string): Promise<Order | undefined> {
+    const [updated] = await db
+      .update(orders)
+      .set({ status, updatedAt: new Date() })
+      .where(eq(orders.id, id))
+      .returning();
+    return updated;
+  }
+
+  async deleteOrder(id: string): Promise<boolean> {
+    const result = await db.delete(orders).where(eq(orders.id, id));
+    return (result.rowCount ?? 0) > 0;
+  }
 }
 
 // In-memory storage implementation for fallback

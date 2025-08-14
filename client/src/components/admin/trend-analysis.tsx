@@ -193,9 +193,9 @@ export function TrendAnalysisComponent() {
                 <div className="space-y-4">
                   <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
                     {latestAnalysis.trends
-                      .sort((a, b) => b.score - a.score)
+                      .sort((a: any, b: any) => b.score - a.score)
                       .slice(0, 12)
-                      .map((trend, index) => (
+                      .map((trend: any, index: number) => (
                       <div
                         key={index}
                         className="flex justify-between items-center p-3 bg-gray-50 rounded-lg"
@@ -235,7 +235,7 @@ export function TrendAnalysisComponent() {
               </CardHeader>
               <CardContent>
                 <div className="space-y-2">
-                  {latestAnalysis.errors.map((error, index) => (
+                  {latestAnalysis.errors.map((error: any, index: number) => (
                     <div key={index} className="text-sm text-red-600 bg-red-50 p-2 rounded">
                       {error}
                     </div>
