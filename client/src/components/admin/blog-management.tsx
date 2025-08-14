@@ -11,6 +11,7 @@ import { Plus, Edit, Trash2, Bot } from "lucide-react";
 import { useToast } from "@/hooks/use-toast";
 import { apiRequest } from "@/lib/queryClient";
 import type { BlogPost } from "@/types";
+import { formatDate } from "@/lib/date-utils";
 
 const ADMIN_TOKEN = "Bearer Gisobot201415*";
 
@@ -166,9 +167,7 @@ export function BlogManagement() {
     }
   };
 
-  const formatDate = (dateString: string) => {
-    return new Date(dateString).toLocaleDateString('uz-UZ');
-  };
+  // Date formatting moved to shared utility
 
   return (
     <div className="space-y-6">

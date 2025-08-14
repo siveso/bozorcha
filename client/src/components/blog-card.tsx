@@ -1,19 +1,14 @@
 import { Card, CardContent } from "@/components/ui/card";
 import { Link } from "wouter";
 import type { BlogPost } from "@/types";
+import { formatDateLong } from "@/lib/date-utils";
 
 interface BlogCardProps {
   post: BlogPost;
 }
 
 export function BlogCard({ post }: BlogCardProps) {
-  const formatDate = (dateString: string) => {
-    return new Date(dateString).toLocaleDateString('uz-UZ', {
-      year: 'numeric',
-      month: 'long',
-      day: 'numeric'
-    });
-  };
+  // Date formatting moved to shared utility
 
   return (
     <Link href={`/blog/${post.id}`}>
@@ -27,7 +22,7 @@ export function BlogCard({ post }: BlogCardProps) {
         
         <CardContent className="p-6">
           <div className="flex items-center text-sm text-gray-500 mb-2">
-            <span data-testid={`blog-date-${post.id}`}>{formatDate(post.publishedAt || post.createdAt)}</span>
+            <span data-testid={`blog-date-${post.id}`}>{formatDateLong(post.publishedAt || post.createdAt)}</span>
             <span className="mx-2">•</span>
             <span data-testid={`blog-category-${post.id}`}>
               {post.tags[0] || 'Umumiy'}

@@ -8,6 +8,7 @@ import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from 
 import { useToast } from "@/hooks/use-toast";
 import { ShoppingBag, Eye, Package, Truck, CheckCircle, XCircle } from "lucide-react";
 import { apiRequest } from "@/lib/queryClient";
+import { formatDateTime } from "@/lib/date-utils";
 
 interface Order {
   id: string;
@@ -85,15 +86,7 @@ export function OrderManagement() {
     updateStatusMutation.mutate({ id: orderId, status: newStatus });
   };
 
-  const formatDate = (dateString: string) => {
-    return new Date(dateString).toLocaleDateString('uz-UZ', {
-      year: 'numeric',
-      month: 'long',
-      day: 'numeric',
-      hour: '2-digit',
-      minute: '2-digit'
-    });
-  };
+  // Date formatting moved to shared utility
 
   const formatPrice = (price: string) => {
     return Number(price).toLocaleString('uz-UZ') + ' so\'m';
@@ -170,7 +163,7 @@ export function OrderManagement() {
                               <p><strong>Manzil:</strong> {order.customerAddress}</p>
                               <p><strong>Mahsulotlar:</strong> {order.items.length} ta</p>
                               <p><strong>Jami:</strong> {formatPrice(order.totalAmount)}</p>
-                              <p><strong>Sana:</strong> {formatDate(order.createdAt)}</p>
+                              <p><strong>Sana:</strong> {formatDateTime(order.createdAt)}</p>
                             </div>
                           </div>
                           
@@ -272,8 +265,8 @@ export function OrderManagement() {
               <div>
                 <h3 className="font-semibold mb-3">Buyurtma tarixi</h3>
                 <div className="space-y-2 text-sm">
-                  <p><strong>Yaratilgan:</strong> {formatDate(selectedOrder.createdAt)}</p>
-                  <p><strong>Oxirgi yangilanish:</strong> {formatDate(selectedOrder.updatedAt)}</p>
+                  <p><strong>Yaratilgan:</strong> {formatDateTime(selectedOrder.createdAt)}</p>
+                  <p><strong>Oxirgi yangilanish:</strong> {formatDateTime(selectedOrder.updatedAt)}</p>
                   <div className="flex items-center gap-2">
                     <strong>Joriy holat:</strong>
                     <Badge>

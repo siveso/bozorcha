@@ -10,6 +10,7 @@ import { Badge } from "@/components/ui/badge";
 import { useToast } from "@/hooks/use-toast";
 import { Plus, Edit, Trash2, Folder } from "lucide-react";
 import { apiRequest } from "@/lib/queryClient";
+import { formatDate } from "@/lib/date-utils";
 
 interface Category {
   id: string;
@@ -258,7 +259,7 @@ export function CategoryManagement() {
                 )}
                 
                 <div className="text-xs text-gray-500 mb-4">
-                  Yaratilgan: {new Date(category.createdAt).toLocaleDateString('uz-UZ')}
+                  Yaratilgan: {formatDate(category.createdAt)}
                 </div>
 
                 <div className="flex gap-2">

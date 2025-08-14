@@ -89,25 +89,48 @@ Kamida 10 ta kalit so'z bering va ularni O'zbek tilida yozing.
   async generateBlogPost(keyword: string, trends: TrendKeyword[]): Promise<InsertBlogPost> {
     try {
       const prompt = `
-"${keyword}" mavzusi bo'yicha O'zbek tilida qiziqarli va foydali blog maqolasi yozing.
-Maqola e-commerce platformasi uchun bo'lib, o'quvchilarga mahsulot tanlash va xarid qilishda yordam berishi kerak.
+"${keyword}" mavzusi bo'yicha professional blog maqolasi yozing. Quyidagi qoidalarga rioya qiling:
 
-Maqola tuzilishi:
-- Qiziqarli sarlavha
-- Qisqacha tavsif (excerpt) 
-- To'liq kontent (kamida 500 so'z)
-- SEO uchun meta title va description
-- 3-5 ta teglar
+YOZISH QOIDALARI:
+1. O'zbek tilida grammatik jihatdan to'g'ri yozing
+2. Rasmiy uslubda, lekin tushunarli tilda yozing
+3. Har bir paragraf bir fikrni ifodalashi kerak
+4. Sarlavhalar aniq va qiziqarli bo'lishi kerak
+5. Faktik ma'lumotlar berish va foydali maslahatlar qo'shish
+6. SEO uchun kalit so'zlarni tabiiy ravishda ishlatish
 
-Javobni JSON formatida bering:
+MAQOLA TUZILISHI:
+- Diqqatni jalb qiluvchi sarlavha (50-60 belgi)
+- Qisqacha kirish (150 so'z ichida)
+- Asosiy qism (kamida 800 so'z):
+  * H2 va H3 sarlavhalar bilan bo'limlar
+  * Ro'yxatlar va raqamlangan ro'yxatlar
+  * Amaliy maslahatlar
+  * Misollar va tushuntirishlar
+- Xulosa va chaqiriq (call-to-action)
+
+E-COMMERCE FOKUSI:
+- Xaridorlarga foydali bo'lgan ma'lumotlar
+- Mahsulot tanlash bo'yicha maslahatlar  
+- Bozor tendentsiyalari haqida ma'lumot
+- O'zbekiston bozori kontekstida yozing
+
+SEO TALABLARI:
+- Meta title 55 belgidan oshmasin
+- Meta description 155 belgidan oshmasin
+- Kalit so'zlarni sarlavha va birinchi paragrafda ishlating
+
+MUHIM: Matnda ** belgilarni ishlatmang! Faqat # sarlavhalar va oddiy matndan foydalaning.
+
+JSON formatida javob bering:
 {
-  "title": "Maqola sarlavhasi",
-  "excerpt": "Qisqacha tavsif (150 so'z ichida)",
-  "content": "To'liq maqola matni",
-  "metaTitle": "SEO title",
-  "metaDescription": "SEO description", 
-  "tags": ["teg1", "teg2", "teg3"],
-  "readTime": 5
+  "title": "Aniq va qiziqarli sarlavha",
+  "excerpt": "Maqolaning qisqacha tavsifi va asosiy fikri",
+  "content": "To'liq maqola matni markdown formatida (** belgilarsiz!)",
+  "metaTitle": "SEO optimallashtirilgan title", 
+  "metaDescription": "Qisqacha va aniq meta description",
+  "tags": ["kalit-soz1", "kalit-soz2", "kalit-soz3", "kalit-soz4"],
+  "readTime": 7
 }
 `;
 

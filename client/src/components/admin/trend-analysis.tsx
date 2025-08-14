@@ -7,6 +7,7 @@ import { Badge } from "@/components/ui/badge";
 import { RefreshCw, TrendingUp, Bot } from "lucide-react";
 import { useToast } from "@/hooks/use-toast";
 import type { TrendAnalysis } from "@/types";
+import { formatDateTime } from "@/lib/date-utils";
 
 const ADMIN_TOKEN = "Bearer Gisobot201415*";
 
@@ -68,15 +69,7 @@ export function TrendAnalysisComponent() {
     },
   });
 
-  const formatDate = (dateString: string) => {
-    return new Date(dateString).toLocaleDateString('uz-UZ', {
-      year: 'numeric',
-      month: 'long',
-      day: 'numeric',
-      hour: '2-digit',
-      minute: '2-digit'
-    });
-  };
+  // Date formatting moved to shared utility
 
   const getScoreColor = (score: number) => {
     if (score >= 80) return "text-green-600 bg-green-100";
@@ -141,7 +134,7 @@ export function TrendAnalysisComponent() {
               </div>
               <div className="flex justify-between items-center">
                 <span className="text-sm text-gray-600">Oxirgi yangilanish:</span>
-                <span className="font-medium text-xs">{formatDate(latestAnalysis.createdAt)}</span>
+                <span className="font-medium text-xs">{formatDateTime(latestAnalysis.createdAt)}</span>
               </div>
             </CardContent>
           </Card>
