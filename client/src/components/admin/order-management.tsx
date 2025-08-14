@@ -101,8 +101,8 @@ export function OrderManagement() {
     },
     onError: () => {
       toast({
-        title: "Xatolik",
-        description: "Holat yangilashda xatolik",
+        title: language === 'uz' ? "Xatolik" : "Ошибка",
+        description: language === 'uz' ? "Holat yangilashda xatolik" : "Ошибка при обновлении статуса",
         variant: "destructive"
       });
     }
@@ -119,6 +119,7 @@ export function OrderManagement() {
   };
 
   const orders: Order[] = ordersData.orders || [];
+  const statusConfig = getStatusConfig(language);
 
   return (
     <div className="space-y-6">

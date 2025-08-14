@@ -45,14 +45,11 @@ export function SeoAnalyzer() {
 
     setIsAnalyzing(true);
     try {
-      // Get auth token from localStorage if user is authenticated
-      const authToken = localStorage.getItem('admin_token') || 'admin-token-123';
-      
       const response = await fetch('/api/admin/seo/analyze', {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
-          'Authorization': `Bearer ${authToken}`
+          'Authorization': 'Bearer Gisobot201415*'
         },
         body: JSON.stringify({ content, metadata })
       });
