@@ -73,14 +73,7 @@ export function ProductManagement() {
   // Create product mutation
   const createMutation = useMutation({
     mutationFn: (data: any) => 
-      apiRequest('/api/admin/products', {
-        method: 'POST',
-        body: JSON.stringify(data),
-        headers: { 
-          'Authorization': 'Bearer Gisobot201415*',
-          'Content-Type': 'application/json'
-        }
-      }),
+      apiRequest('POST', '/api/admin/products', data),
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['/api/admin/products'] });
       setIsCreateDialogOpen(false);
@@ -102,14 +95,7 @@ export function ProductManagement() {
   // Update product mutation
   const updateMutation = useMutation({
     mutationFn: ({ id, data }: { id: string, data: any }) => 
-      apiRequest(`/api/admin/products/${id}`, {
-        method: 'PUT',
-        body: JSON.stringify(data),
-        headers: { 
-          'Authorization': 'Bearer Gisobot201415*',
-          'Content-Type': 'application/json'
-        }
-      }),
+      apiRequest('PUT', `/api/admin/products/${id}`, data),
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['/api/admin/products'] });
       setIsEditDialogOpen(false);
@@ -132,10 +118,7 @@ export function ProductManagement() {
   // Delete product mutation
   const deleteMutation = useMutation({
     mutationFn: (id: string) => 
-      apiRequest(`/api/admin/products/${id}`, {
-        method: 'DELETE',
-        headers: { 'Authorization': 'Bearer Gisobot201415*' }
-      }),
+      apiRequest('DELETE', `/api/admin/products/${id}`),
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['/api/admin/products'] });
       toast({

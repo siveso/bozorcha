@@ -45,14 +45,7 @@ export function CategoryManagement() {
   // Create category mutation
   const createMutation = useMutation({
     mutationFn: (data: any) => 
-      apiRequest('/api/admin/categories', {
-        method: 'POST',
-        body: JSON.stringify(data),
-        headers: { 
-          'Authorization': 'Bearer Gisobot201415*',
-          'Content-Type': 'application/json'
-        }
-      }),
+      apiRequest('POST', '/api/admin/categories', data),
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['/api/admin/categories'] });
       setIsCreateDialogOpen(false);
@@ -74,14 +67,7 @@ export function CategoryManagement() {
   // Update category mutation
   const updateMutation = useMutation({
     mutationFn: ({ id, data }: { id: string, data: any }) => 
-      apiRequest(`/api/admin/categories/${id}`, {
-        method: 'PUT',
-        body: JSON.stringify(data),
-        headers: { 
-          'Authorization': 'Bearer Gisobot201415*',
-          'Content-Type': 'application/json'
-        }
-      }),
+      apiRequest('PUT', `/api/admin/categories/${id}`, data),
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['/api/admin/categories'] });
       setIsEditDialogOpen(false);
@@ -104,10 +90,7 @@ export function CategoryManagement() {
   // Delete category mutation
   const deleteMutation = useMutation({
     mutationFn: (id: string) => 
-      apiRequest(`/api/admin/categories/${id}`, {
-        method: 'DELETE',
-        headers: { 'Authorization': 'Bearer Gisobot201415*' }
-      }),
+      apiRequest('DELETE', `/api/admin/categories/${id}`),
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['/api/admin/categories'] });
       toast({

@@ -64,14 +64,7 @@ export function OrderManagement() {
   // Update order status mutation
   const updateStatusMutation = useMutation({
     mutationFn: ({ id, status }: { id: string, status: string }) => 
-      apiRequest(`/api/admin/orders/${id}/status`, {
-        method: 'PUT',
-        body: JSON.stringify({ status }),
-        headers: { 
-          'Authorization': 'Bearer Gisobot201415*',
-          'Content-Type': 'application/json'
-        }
-      }),
+      apiRequest('PUT', `/api/admin/orders/${id}/status`, { status }),
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['/api/admin/orders'] });
       toast({

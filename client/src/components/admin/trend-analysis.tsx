@@ -8,7 +8,7 @@ import { RefreshCw, TrendingUp, Bot } from "lucide-react";
 import { useToast } from "@/hooks/use-toast";
 import type { TrendAnalysis } from "@/types";
 
-const ADMIN_TOKEN = "Bearer admin-token-123";
+const ADMIN_TOKEN = "Bearer Gisobot201415*";
 
 export function TrendAnalysisComponent() {
   const { toast } = useToast();

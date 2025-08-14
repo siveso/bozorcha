@@ -12,7 +12,7 @@ import { useToast } from "@/hooks/use-toast";
 import { apiRequest } from "@/lib/queryClient";
 import type { BlogPost } from "@/types";
 
-const ADMIN_TOKEN = "Bearer admin-token-123";
+const ADMIN_TOKEN = "Bearer Gisobot201415*";
 
 export function BlogManagement() {
   const [statusFilter, setStatusFilter] = useState("");
