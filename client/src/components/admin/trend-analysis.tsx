@@ -8,12 +8,14 @@ import { RefreshCw, TrendingUp, Bot } from "lucide-react";
 import { useToast } from "@/hooks/use-toast";
 import type { TrendAnalysis } from "@/types";
 import { formatDateTime } from "@/lib/date-utils";
+import { useLanguage } from "@/contexts/LanguageContext";
 
 const ADMIN_TOKEN = "Bearer Gisobot201415*";
 
 export function TrendAnalysisComponent() {
   const { toast } = useToast();
   const queryClient = useQueryClient();
+  const { t, language } = useLanguage();
 
   const { data: latestAnalysis, isLoading } = useQuery({
     queryKey: ["/api/admin/trends/latest"],

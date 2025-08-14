@@ -12,6 +12,7 @@ import { useToast } from "@/hooks/use-toast";
 import { apiRequest } from "@/lib/queryClient";
 import type { BlogPost } from "@/types";
 import { formatDate } from "@/lib/date-utils";
+import { useLanguage } from "@/contexts/LanguageContext";
 
 const ADMIN_TOKEN = "Bearer Gisobot201415*";
 
@@ -32,6 +33,7 @@ export function BlogManagement() {
 
   const { toast } = useToast();
   const queryClient = useQueryClient();
+  const { t, language } = useLanguage();
 
   const { data: postsData, isLoading } = useQuery({
     queryKey: ["/api/admin/blog", statusFilter],

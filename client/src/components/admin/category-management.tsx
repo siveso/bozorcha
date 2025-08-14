@@ -11,6 +11,7 @@ import { useToast } from "@/hooks/use-toast";
 import { Plus, Edit, Trash2, Folder } from "lucide-react";
 import { apiRequest } from "@/lib/queryClient";
 import { formatDate } from "@/lib/date-utils";
+import { useLanguage } from "@/contexts/LanguageContext";
 
 interface Category {
   id: string;
@@ -33,6 +34,7 @@ export function CategoryManagement() {
 
   const { toast } = useToast();
   const queryClient = useQueryClient();
+  const { t } = useLanguage();
 
   // Fetch categories
   const { data: categoriesData = { categories: [] }, isLoading } = useQuery({
@@ -52,8 +54,8 @@ export function CategoryManagement() {
       setIsCreateDialogOpen(false);
       resetForm();
       toast({
-        title: "Muvaffaqiyat",
-        description: "Kategoriya yaratildi",
+        title: "Muvaffaqiyat / Успех",
+        description: "Kategoriya yaratildi / Категория создана",
       });
     },
     onError: () => {
@@ -163,35 +165,35 @@ export function CategoryManagement() {
     <div className="space-y-6">
       <div className="flex justify-between items-center">
         <div>
-          <h2 className="text-2xl font-bold">Kategoriyalar boshqaruvi</h2>
-          <p className="text-gray-600">Kategoriyalarni qo'shish, o'zgartirish va boshqarish</p>
+          <h2 className="text-2xl font-bold">{t('categories_management')}</h2>
+          <p className="text-gray-600">{t('language') === 'uz' ? "Kategoriyalarni qo'shish, o'zgartirish va boshqarish" : "Добавление, изменение и управление категориями"}</p>
         </div>
         
         <Dialog open={isCreateDialogOpen} onOpenChange={setIsCreateDialogOpen}>
           <DialogTrigger asChild>
             <Button>
               <Plus className="h-4 w-4 mr-2" />
-              Yangi kategoriya
+              {t('language') === 'uz' ? 'Yangi kategoriya' : 'Новая категория'}
             </Button>
           </DialogTrigger>
           <DialogContent>
             <DialogHeader>
-              <DialogTitle>Yangi kategoriya yaratish</DialogTitle>
+              <DialogTitle>{t('language') === 'uz' ? 'Yangi kategoriya yaratish' : 'Создание новой категории'}</DialogTitle>
             </DialogHeader>
             <form onSubmit={handleCreate} className="space-y-4">
               <div className="space-y-2">
-                <Label htmlFor="name">Kategoriya nomi *</Label>
+                <Label htmlFor="name">{t('category_name')} *</Label>
                 <Input
                   id="name"
                   value={formData.name}
                   onChange={(e) => handleNameChange(e.target.value)}
-                  placeholder="Masalan: Elektronika"
+                  placeholder={t('language') === 'uz' ? "Masalan: Elektronika" : "Например: Электроника"}
                   required
                 />
               </div>
 
               <div className="space-y-2">
-                <Label htmlFor="slug">Slug *</Label>
+                <Label htmlFor="slug">{t('category_slug')} *</Label>
                 <Input
                   id="slug"
                   value={formData.slug}
@@ -199,26 +201,26 @@ export function CategoryManagement() {
                   placeholder="elektronika"
                   required
                 />
-                <p className="text-xs text-gray-500">URL da foydalanish uchun (otomatik yaratiladi)</p>
+                <p className="text-xs text-gray-500">{t('language') === 'uz' ? "URL da foydalanish uchun (otomatik yaratiladi)" : "Для использования в URL (создается автоматически)"}</p>
               </div>
 
               <div className="space-y-2">
-                <Label htmlFor="description">Ta'rif</Label>
+                <Label htmlFor="description">{t('category_description')}</Label>
                 <Textarea
                   id="description"
                   value={formData.description}
                   onChange={(e) => setFormData(prev => ({ ...prev, description: e.target.value }))}
-                  placeholder="Kategoriya haqida qisqacha ma'lumot"
+                  placeholder={t('language') === 'uz' ? "Kategoriya haqida qisqacha ma'lumot" : "Краткая информация о категории"}
                   rows={3}
                 />
               </div>
 
               <div className="flex gap-3">
                 <Button type="submit" disabled={createMutation.isPending}>
-                  {createMutation.isPending ? "Yaratilmoqda..." : "Yaratish"}
+                  {createMutation.isPending ? (t('language') === 'uz' ? "Yaratilmoqda..." : "Создается...") : (t('language') === 'uz' ? "Yaratish" : "Создать")}
                 </Button>
                 <Button type="button" variant="outline" onClick={() => setIsCreateDialogOpen(false)}>
-                  Bekor qilish
+                  {t('language') === 'uz' ? 'Bekor qilish' : 'Отмена'}
                 </Button>
               </div>
             </form>
@@ -229,13 +231,13 @@ export function CategoryManagement() {
       {/* Categories List */}
       <div className="grid gap-4">
         {isLoading ? (
-          <div className="text-center py-8">Yuklanmoqda...</div>
+          <div className="text-center py-8">{t('language') === 'uz' ? 'Yuklanmoqda...' : 'Загрузка...'}</div>
         ) : categories.length === 0 ? (
           <Card>
             <CardContent className="flex flex-col items-center justify-center py-16">
               <Folder className="h-12 w-12 text-gray-400 mb-4" />
-              <h3 className="text-lg font-semibold text-gray-600">Hech qanday kategoriya topilmadi</h3>
-              <p className="text-gray-500">Birinchi kategoriyangizni yarating</p>
+              <h3 className="text-lg font-semibold text-gray-600">{t('language') === 'uz' ? 'Hech qanday kategoriya topilmadi' : 'Категории не найдены'}</h3>
+              <p className="text-gray-500">{t('language') === 'uz' ? 'Birinchi kategoriyangizni yarating' : 'Создайте свою первую категорию'}</p>
             </CardContent>
           </Card>
         ) : (

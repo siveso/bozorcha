@@ -9,6 +9,7 @@ import { useToast } from "@/hooks/use-toast";
 import { ShoppingBag, Eye, Package, Truck, CheckCircle, XCircle } from "lucide-react";
 import { apiRequest } from "@/lib/queryClient";
 import { formatDateTime } from "@/lib/date-utils";
+import { useLanguage } from "@/contexts/LanguageContext";
 
 interface Order {
   id: string;
@@ -31,14 +32,38 @@ interface Order {
   updatedAt: string;
 }
 
-const statusConfig = {
-  pending: { label: "Kutilmoqda", color: "yellow", icon: Package },
-  confirmed: { label: "Tasdiqlangan", color: "blue", icon: CheckCircle },
-  processing: { label: "Tayyorlanmoqda", color: "purple", icon: Package },
-  shipped: { label: "Jo'natilgan", color: "orange", icon: Truck },
-  delivered: { label: "Yetkazilgan", color: "green", icon: CheckCircle },
-  cancelled: { label: "Bekor qilingan", color: "red", icon: XCircle },
-};
+const getStatusConfig = (language: string) => ({
+  pending: { 
+    label: language === 'uz' ? "Kutilmoqda" : "Ожидание", 
+    color: "yellow", 
+    icon: Package 
+  },
+  confirmed: { 
+    label: language === 'uz' ? "Tasdiqlangan" : "Подтвержден", 
+    color: "blue", 
+    icon: CheckCircle 
+  },
+  processing: { 
+    label: language === 'uz' ? "Tayyorlanmoqda" : "В обработке", 
+    color: "purple", 
+    icon: Package 
+  },
+  shipped: { 
+    label: language === 'uz' ? "Jo'natilgan" : "Отправлен", 
+    color: "orange", 
+    icon: Truck 
+  },
+  delivered: { 
+    label: language === 'uz' ? "Yetkazilgan" : "Доставлен", 
+    color: "green", 
+    icon: CheckCircle 
+  },
+  cancelled: { 
+    label: language === 'uz' ? "Bekor qilingan" : "Отменен", 
+    color: "red", 
+    icon: XCircle 
+  },
+});
 
 export function OrderManagement() {
   const [selectedStatus, setSelectedStatus] = useState<string>("all");
@@ -47,6 +72,7 @@ export function OrderManagement() {
 
   const { toast } = useToast();
   const queryClient = useQueryClient();
+  const { t, language } = useLanguage();
 
   // Fetch orders
   const { data: ordersData = { orders: [], total: 0 }, isLoading } = useQuery({
@@ -69,8 +95,8 @@ export function OrderManagement() {
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['/api/admin/orders'] });
       toast({
-        title: "Muvaffaqiyat",
-        description: "Buyurtma holati yangilandi",
+        title: language === 'uz' ? "Muvaffaqiyat" : "Успех",
+        description: language === 'uz' ? "Buyurtma holati yangilandi" : "Статус заказа обновлен",
       });
     },
     onError: () => {

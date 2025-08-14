@@ -10,10 +10,13 @@ import { SeoAnalyzer } from "@/components/seo/SeoAnalyzer";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Box, Newspaper, TrendingUp, Search, ShoppingBag, Folder } from "lucide-react";
+import { useLanguage } from "@/contexts/LanguageContext";
+import { LanguageSwitcher } from "@/components/LanguageSwitcher";
 
 export default function Admin() {
   const [isAuthenticated, setIsAuthenticated] = useState(false);
   const [password, setPassword] = useState("");
+  const { t, language } = useLanguage();
 
   const handleAuth = (e: React.FormEvent) => {
     e.preventDefault();
@@ -21,7 +24,7 @@ export default function Admin() {
     if (password === "Gisobot201415*") {
       setIsAuthenticated(true);
     } else {
-      alert("Noto'g'ri parol");
+      alert(language === 'uz' ? "Noto'g'ri parol" : "Неверный пароль");
     }
   };
 
@@ -30,26 +33,29 @@ export default function Admin() {
       <div className="min-h-screen bg-gray-900 flex items-center justify-center">
         <Card className="w-full max-w-md">
           <CardHeader>
-            <CardTitle className="text-center">Bozorcha Admin Panel</CardTitle>
+            <CardTitle className="text-center">{t('admin_panel')}</CardTitle>
+            <div className="flex justify-center mt-2">
+              <LanguageSwitcher />
+            </div>
           </CardHeader>
           <CardContent>
             <form onSubmit={handleAuth} className="space-y-4">
               <div>
                 <label htmlFor="password" className="text-sm font-medium">
-                  Admin parolini kiriting
+                  {language === 'uz' ? 'Admin parolini kiriting' : 'Введите пароль администратора'}
                 </label>
                 <Input
                   id="password"
                   type="password"
                   value={password}
                   onChange={(e) => setPassword(e.target.value)}
-                  placeholder="Parol..."
+                  placeholder={language === 'uz' ? 'Parol...' : 'Пароль...'}
                   required
                   data-testid="admin-password-input"
                 />
               </div>
               <Button type="submit" className="w-full" data-testid="admin-login-button">
-                Kirish
+                {language === 'uz' ? 'Kirish' : 'Войти'}
               </Button>
             </form>
           </CardContent>
@@ -64,16 +70,19 @@ export default function Admin() {
       <header className="bg-white shadow-sm border-b border-gray-200 px-6 py-4">
         <div className="flex items-center justify-between">
           <div>
-            <h1 className="text-2xl font-semibold text-gray-900">Bozorcha Admin Panel</h1>
-            <p className="text-gray-600">Boshqaruv paneli</p>
+            <h1 className="text-2xl font-semibold text-gray-900">{t('admin_panel')}</h1>
+            <p className="text-gray-600">{t('dashboard')}</p>
           </div>
-          <Button 
-            onClick={() => setIsAuthenticated(false)} 
-            variant="outline"
-            data-testid="admin-logout-button"
-          >
-            Chiqish
-          </Button>
+          <div className="flex items-center space-x-4">
+            <LanguageSwitcher />
+            <Button 
+              onClick={() => setIsAuthenticated(false)} 
+              variant="outline"
+              data-testid="admin-logout-button"
+            >
+              {t('logout')}
+            </Button>
+          </div>
         </div>
       </header>
 
@@ -83,27 +92,27 @@ export default function Admin() {
           <TabsList className="grid w-full grid-cols-6">
             <TabsTrigger value="products" className="flex items-center gap-2" data-testid="products-tab">
               <Box className="h-4 w-4" />
-              Mahsulotlar
+              {t('products_management')}
             </TabsTrigger>
             <TabsTrigger value="categories" className="flex items-center gap-2" data-testid="categories-tab">
               <Folder className="h-4 w-4" />
-              Kategoriyalar
+              {t('categories_management')}
             </TabsTrigger>
             <TabsTrigger value="orders" className="flex items-center gap-2" data-testid="orders-tab">
               <ShoppingBag className="h-4 w-4" />
-              Buyurtmalar
+              {t('orders_management')}
             </TabsTrigger>
             <TabsTrigger value="blog" className="flex items-center gap-2" data-testid="blog-tab">
               <Newspaper className="h-4 w-4" />
-              Blog
+              {t('blog_management')}
             </TabsTrigger>
             <TabsTrigger value="trends" className="flex items-center gap-2" data-testid="trends-tab">
               <TrendingUp className="h-4 w-4" />
-              Tendensiyalar
+              {t('trends_analysis')}
             </TabsTrigger>
             <TabsTrigger value="seo" className="flex items-center gap-2" data-testid="seo-tab">
               <Search className="h-4 w-4" />
-              SEO
+              {t('seo_tools')}
             </TabsTrigger>
           </TabsList>
 

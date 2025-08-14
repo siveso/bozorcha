@@ -82,6 +82,79 @@ export interface Translations {
   quick_links: string;
   contact_info: string;
   follow_us: string;
+  
+  // Admin Panel
+  admin_panel: string;
+  dashboard: string;
+  products_management: string;
+  categories_management: string;
+  orders_management: string;
+  blog_management: string;
+  trends_analysis: string;
+  seo_tools: string;
+  logout: string;
+  add_new: string;
+  edit: string;
+  delete: string;
+  save: string;
+  
+  // Product Management
+  product_name: string;
+  product_description: string;
+  product_price: string;
+  product_category: string;
+  product_images: string;
+  youtube_video: string;
+  stock_quantity: string;
+  meta_title: string;
+  meta_description: string;
+  keywords: string;
+  rating: string;
+  review_count: string;
+  active: string;
+  inactive: string;
+  
+  // Categories
+  category_name: string;
+  category_slug: string;
+  category_description: string;
+  
+  // Orders
+  order_number: string;
+  customer_name: string;
+  order_status: string;
+  order_total: string;
+  order_date: string;
+  pending: string;
+  processing: string;
+  shipped: string;
+  delivered: string;
+  cancelled: string;
+  
+  // Blog
+  post_title: string;
+  post_content: string;
+  post_excerpt: string;
+  post_tags: string;
+  publish_date: string;
+  post_status: string;
+  draft: string;
+  published: string;
+  
+  // Trends
+  trend_keyword: string;
+  search_volume: string;
+  competition: string;
+  trend_score: string;
+  last_updated: string;
+  generate_content: string;
+  
+  // SEO
+  seo_analysis: string;
+  seo_score: string;
+  page_title: string;
+  page_description: string;
+  analyze_page: string;
 }
 
 // Uzbek translations
@@ -159,6 +232,79 @@ export const UZ_TRANSLATIONS: Translations = {
   quick_links: "Tezkor havolalar",
   contact_info: "Bog'lanish",
   follow_us: "Ijtimoiy tarmoqlar",
+  
+  // Admin Panel
+  admin_panel: "Bozorcha Admin Panel",
+  dashboard: "Boshqaruv paneli",
+  products_management: "Mahsulotlar",
+  categories_management: "Kategoriyalar",
+  orders_management: "Buyurtmalar",
+  blog_management: "Blog",
+  trends_analysis: "Tendensiyalar",
+  seo_tools: "SEO",
+  logout: "Chiqish",
+  add_new: "Yangi mahsulot",
+  edit: "Tahrirlash",
+  delete: "O'chirish",
+  save: "Saqlash",
+  
+  // Product Management
+  product_name: "Mahsulot nomi",
+  product_description: "Tavsif",
+  product_price: "Narx",
+  product_category: "Kategoriya",
+  product_images: "Rasmlar",
+  youtube_video: "YouTube video",
+  stock_quantity: "Miqdor",
+  meta_title: "Meta sarlavha",
+  meta_description: "Meta tavsif",
+  keywords: "Kalit so'zlar",
+  rating: "Reyting",
+  review_count: "Rasmlar",
+  active: "Faol",
+  inactive: "Nofaol",
+  
+  // Categories
+  category_name: "Kategoriya nomi",
+  category_slug: "Slug",
+  category_description: "Tavsif",
+  
+  // Orders
+  order_number: "Buyurtma raqami",
+  customer_name: "Mijoz ismi",
+  order_status: "Holat",
+  order_total: "Jami summa",
+  order_date: "Sana",
+  pending: "Kutilmoqda",
+  processing: "Jarayonda",
+  shipped: "Yuborilgan",
+  delivered: "Yetkazilgan",
+  cancelled: "Bekor qilingan",
+  
+  // Blog
+  post_title: "Maqola sarlavhasi",
+  post_content: "Mazmun",
+  post_excerpt: "Qisqacha",
+  post_tags: "Teglar",
+  publish_date: "Nashr sanasi",
+  post_status: "Holat",
+  draft: "Qoralama",
+  published: "Nashr qilingan",
+  
+  // Trends
+  trend_keyword: "Kalit so'z",
+  search_volume: "Qidiruv hajmi",
+  competition: "Raqobat",
+  trend_score: "Trend ball",
+  last_updated: "Oxirgi yangilanish",
+  generate_content: "Kontent yaratish",
+  
+  // SEO
+  seo_analysis: "SEO tahlil",
+  seo_score: "SEO ball",
+  page_title: "Sahifa sarlavhasi",
+  page_description: "Sahifa tavsifi",
+  analyze_page: "Sahifani tahlil qilish",
 };
 
 // Russian translations
@@ -236,6 +382,79 @@ export const RU_TRANSLATIONS: Translations = {
   quick_links: "Быстрые ссылки",
   contact_info: "Контакты",
   follow_us: "Социальные сети",
+  
+  // Admin Panel
+  admin_panel: "Bozorcha Админ Панель",
+  dashboard: "Панель управления",
+  products_management: "Товары",
+  categories_management: "Категории",
+  orders_management: "Заказы",
+  blog_management: "Блог",
+  trends_analysis: "Тенденции",
+  seo_tools: "SEO",
+  logout: "Выход",
+  add_new: "Новый товар",
+  edit: "Редактировать",
+  delete: "Удалить",
+  save: "Сохранить",
+  
+  // Product Management
+  product_name: "Название товара",
+  product_description: "Описание",
+  product_price: "Цена",
+  product_category: "Категория",
+  product_images: "Изображения",
+  youtube_video: "YouTube видео",
+  stock_quantity: "Количество",
+  meta_title: "Мета заголовок",
+  meta_description: "Мета описание",
+  keywords: "Ключевые слова",
+  rating: "Рейтинг",
+  review_count: "Отзывы",
+  active: "Активный",
+  inactive: "Неактивный",
+  
+  // Categories
+  category_name: "Название категории",
+  category_slug: "Слаг",
+  category_description: "Описание",
+  
+  // Orders
+  order_number: "Номер заказа",
+  customer_name: "Имя клиента",
+  order_status: "Статус",
+  order_total: "Общая сумма",
+  order_date: "Дата",
+  pending: "Ожидание",
+  processing: "В обработке",
+  shipped: "Отправлен",
+  delivered: "Доставлен",
+  cancelled: "Отменен",
+  
+  // Blog
+  post_title: "Заголовок статьи",
+  post_content: "Содержание",
+  post_excerpt: "Краткое описание",
+  post_tags: "Теги",
+  publish_date: "Дата публикации",
+  post_status: "Статус",
+  draft: "Черновик",
+  published: "Опубликовано",
+  
+  // Trends
+  trend_keyword: "Ключевое слово",
+  search_volume: "Объем поиска",
+  competition: "Конкуренция",
+  trend_score: "Баллы тренда",
+  last_updated: "Последнее обновление",
+  generate_content: "Создать контент",
+  
+  // SEO
+  seo_analysis: "SEO анализ",
+  seo_score: "SEO баллы",
+  page_title: "Заголовок страницы",
+  page_description: "Описание страницы",
+  analyze_page: "Анализировать страницу",
 };
 
 // Combined translations
