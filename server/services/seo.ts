@@ -1,61 +1,17 @@
-import type { Product, BlogPost, Category } from "@shared/schema";
-
-export interface SeoMetadata {
-  title: string;
-  description: string;
-  keywords: string[];
-  canonicalUrl?: string;
-  ogTitle?: string;
-  ogDescription?: string;
-  ogImage?: string;
-  ogType?: string;
-  twitterCard?: string;
-  twitterTitle?: string;
-  twitterDescription?: string;
-  twitterImage?: string;
-  structuredData?: any;
-}
-
-export interface SitemapEntry {
-  url: string;
-  lastmod: string;
-  changefreq: 'always' | 'hourly' | 'daily' | 'weekly' | 'monthly' | 'yearly' | 'never';
-  priority: number;
-}
+import type { Product, BlogPost, Category } from "@/../../shared/schema";
 
 export class SeoService {
-  private baseUrl = process.env.BASE_URL || 'https://bozorcha.uz';
-
-  // Generate SEO metadata for products
-  generateProductSeo(product: Product): SeoMetadata {
-    const title = product.metaTitle || `${product.name} - Arzon Narx | Bozorcha`;
-    const description = product.metaDescription || 
-      `${product.name} mahsulotini eng yaxshi narxda sotib oling. ${product.description.substring(0, 120)}...`;
-    
-    const keywords = product.keywords || [];
-    const enhancedKeywords = [
-      ...keywords,
-      product.name.toLowerCase(),
-      product.category,
-      'arzon narx',
-      'onlayn xarid',
-      'bozorcha',
-      'o\'zbekiston'
-    ];
-
-    const structuredData = {
+  // Generate structured data for products
+  generateProductStructuredData(product: Product) {
+    return {
       "@context": "https://schema.org/",
       "@type": "Product",
       "name": product.name,
       "description": product.description,
-      "image": product.images?.[0] || '',
-      "brand": {
-        "@type": "Brand",
-        "name": "Bozorcha"
-      },
+      "image": product.images,
       "offers": {
         "@type": "Offer",
-        "url": `${this.baseUrl}/product/${product.id}`,
+        "url": `https://bozorcha.uz/product/${product.id}`,
         "priceCurrency": "UZS",
         "price": product.price,
         "availability": product.stock > 0 ? "https://schema.org/InStock" : "https://schema.org/OutOfStock",
@@ -64,322 +20,300 @@ export class SeoService {
           "name": "Bozorcha"
         }
       },
-      "aggregateRating": product.rating && product.reviewCount ? {
+      "aggregateRating": {
         "@type": "AggregateRating",
-        "ratingValue": product.rating,
-        "reviewCount": product.reviewCount
-      } : undefined,
+        "ratingValue": product.rating || "4.5",
+        "reviewCount": product.reviewCount || 1
+      },
+      "brand": {
+        "@type": "Brand",
+        "name": product.name.split(' ')[0] // First word as brand
+      },
       "category": product.category
-    };
-
-    return {
-      title,
-      description,
-      keywords: enhancedKeywords,
-      canonicalUrl: `${this.baseUrl}/product/${product.id}`,
-      ogTitle: title,
-      ogDescription: description,
-      ogImage: product.images?.[0] || `${this.baseUrl}/api/placeholder/800/600`,
-      ogType: 'product',
-      twitterCard: 'summary_large_image',
-      twitterTitle: title,
-      twitterDescription: description,
-      twitterImage: product.images?.[0] || `${this.baseUrl}/api/placeholder/800/600`,
-      structuredData
     };
   }
 
-  // Generate SEO metadata for blog posts
-  generateBlogSeo(post: BlogPost): SeoMetadata {
-    const title = post.metaTitle || `${post.title} | Bozorcha Blog`;
-    const description = post.metaDescription || post.excerpt;
-    
-    const keywords = [
-      ...(post.tags || []),
-      ...(post.trendingKeywords || []),
-      'blog',
-      'maslahat',
-      'bozorcha'
-    ];
-
-    const structuredData = {
+  // Generate structured data for blog posts
+  generateBlogStructuredData(post: BlogPost) {
+    return {
       "@context": "https://schema.org",
       "@type": "Article",
       "headline": post.title,
       "description": post.excerpt,
       "author": {
-        "@type": "Organization",
-        "name": "Bozorcha"
+        "@type": "Person",
+        "name": "Bozorcha Team"
       },
       "publisher": {
         "@type": "Organization",
         "name": "Bozorcha",
         "logo": {
           "@type": "ImageObject",
-          "url": `${this.baseUrl}/logo.png`
+          "url": "https://bozorcha.uz/logo.png"
         }
       },
-      "datePublished": post.publishedAt?.toISOString(),
-      "dateModified": post.updatedAt?.toISOString(),
+      "datePublished": post.publishedAt,
+      "dateModified": post.updatedAt,
       "mainEntityOfPage": {
         "@type": "WebPage",
-        "@id": `${this.baseUrl}/blog/${post.id}`
-      },
-      "wordCount": post.content.split(' ').length,
-      "keywords": keywords.join(', ')
-    };
-
-    return {
-      title,
-      description,
-      keywords,
-      canonicalUrl: `${this.baseUrl}/blog/${post.id}`,
-      ogTitle: title,
-      ogDescription: description,
-      ogType: 'article',
-      twitterCard: 'summary',
-      twitterTitle: title,
-      twitterDescription: description,
-      structuredData
+        "@id": `https://bozorcha.uz/blog/${post.id}`
+      }
     };
   }
 
-  // Generate SEO metadata for category pages
-  generateCategorySeo(category: Category, productCount: number): SeoMetadata {
-    const title = `${category.name} - ${productCount} ta mahsulot | Bozorcha`;
-    const description = category.description || 
-      `${category.name} kategoriyasidagi ${productCount} ta mahsulotni ko'ring. Eng yaxshi narxlar va sifatli xizmat.`;
+  // Generate SEO metadata for product pages
+  generateProductSeo(product: Product) {
+    const title = `${product.name} | Bozorcha - Онлайн магазин Узбекистана`;
+    const description = `${product.description.substring(0, 140)}... Купить с бесплатной доставкой по Узбекистану.`;
     
-    const keywords = [
-      category.name.toLowerCase(),
-      category.slug,
-      'kategoriya',
-      'mahsulotlar',
-      'bozorcha',
-      'onlayn xarid'
-    ];
-
-    const structuredData = {
-      "@context": "https://schema.org",
-      "@type": "CollectionPage",
-      "name": category.name,
-      "description": description,
-      "url": `${this.baseUrl}/category/${category.slug}`,
-      "mainEntity": {
-        "@type": "ItemList",
-        "numberOfItems": productCount
-      }
-    };
-
     return {
       title,
       description,
-      keywords,
-      canonicalUrl: `${this.baseUrl}/category/${category.slug}`,
-      ogTitle: title,
-      ogDescription: description,
-      ogType: 'website',
-      twitterCard: 'summary',
-      twitterTitle: title,
-      twitterDescription: description,
-      structuredData
+      keywords: product.keywords,
+      openGraph: {
+        title,
+        description,
+        type: 'product',
+        images: product.images,
+        url: `https://bozorcha.uz/product/${product.id}`
+      },
+      structuredData: this.generateProductStructuredData(product)
+    };
+  }
+
+  // Generate SEO metadata for blog posts
+  generateBlogSeo(post: BlogPost) {
+    const title = `${post.title} | Bozorcha Blog`;
+    const description = post.excerpt || `${post.content.substring(0, 140)}...`;
+    
+    return {
+      title,
+      description,
+      keywords: post.keywords,
+      openGraph: {
+        title,
+        description,
+        type: 'article',
+        url: `https://bozorcha.uz/blog/${post.id}`,
+        publishedTime: post.publishedAt
+      },
+      structuredData: this.generateBlogStructuredData(post)
     };
   }
 
   // Generate homepage SEO
-  generateHomepageSeo(totalProducts: number, totalCategories: number): SeoMetadata {
-    const title = "Bozorcha - O'zbekistonning Eng Yaxshi Onlayn Do'koni";
-    const description = `${totalProducts} ta mahsulot, ${totalCategories} ta kategoriya. Eng yaxshi narxlar va tezkor yetkazib berish. Bozorcha bilan xarid qiling!`;
-    
-    const keywords = [
-      'onlayn dokon',
-      'elektronika',
-      'kiyim',
-      'uy jihozlari',
-      'arzon narx',
-      'tezkor yetkazib berish',
-      'o\'zbekiston',
-      'bozorcha'
-    ];
-
-    const structuredData = {
-      "@context": "https://schema.org",
-      "@type": "WebSite",
-      "name": "Bozorcha",
-      "url": this.baseUrl,
-      "description": description,
-      "potentialAction": {
-        "@type": "SearchAction",
-        "target": `${this.baseUrl}/search?q={search_term_string}`,
-        "query-input": "required name=search_term_string"
+  generateHomepageSeo(productsCount: number, categoriesCount: number) {
+    return {
+      title: "Bozorcha - Лучший интернет-магазин Узбекистана | Энг яхши онлайн дўкон",
+      description: `Покупайте качественные товары в Узбекистане. Более ${productsCount} товаров в ${categoriesCount} категориях. Бесплатная доставка по всему Узбекистану. Sifatli mahsulotlar, tez yetkazish.`,
+      keywords: [
+        "интернет магазин узбекистан",
+        "онлайн дўкон",
+        "bozorcha",
+        "купить онлайн",
+        "sotib olish",
+        "доставка ташкент",
+        "yetkazish",
+        "электроника",
+        "elektronika",
+        "одежда",
+        "kiyim"
+      ],
+      openGraph: {
+        title: "Bozorcha - Интернет-магазин №1 в Узбекистане",
+        description: "Лучшие товары по доступным ценам. Быстрая доставка по всему Узбекистану.",
+        type: 'website',
+        url: 'https://bozorcha.uz',
+        locale: 'uz_UZ',
+        alternateLocales: ['ru_UZ']
       },
-      "publisher": {
-        "@type": "Organization",
+      structuredData: {
+        "@context": "https://schema.org",
+        "@type": "WebSite",
         "name": "Bozorcha",
-        "logo": {
-          "@type": "ImageObject",
-          "url": `${this.baseUrl}/logo.png`
+        "alternateName": "Бозорча",
+        "url": "https://bozorcha.uz",
+        "description": "Интернет-магазин №1 в Узбекистане",
+        "inLanguage": ["uz", "ru"],
+        "potentialAction": {
+          "@type": "SearchAction",
+          "target": "https://bozorcha.uz/?search={search_term_string}",
+          "query-input": "required name=search_term_string"
         }
       }
-    };
-
-    return {
-      title,
-      description,
-      keywords,
-      canonicalUrl: this.baseUrl,
-      ogTitle: title,
-      ogDescription: description,
-      ogType: 'website',
-      twitterCard: 'summary_large_image',
-      twitterTitle: title,
-      twitterDescription: description,
-      structuredData
     };
   }
 
   // Generate XML sitemap
-  generateSitemap(products: Product[], blogPosts: BlogPost[], categories: Category[]): string {
-    const entries: SitemapEntry[] = [
-      // Homepage
-      {
-        url: this.baseUrl,
-        lastmod: new Date().toISOString().split('T')[0],
-        changefreq: 'daily',
-        priority: 1.0
-      },
-      // Categories
-      ...categories.map(category => ({
-        url: `${this.baseUrl}/category/${category.slug}`,
-        lastmod: category.createdAt?.toISOString().split('T')[0] || new Date().toISOString().split('T')[0],
-        changefreq: 'weekly' as const,
-        priority: 0.8
-      })),
-      // Products
-      ...products.filter(p => p.isActive).map(product => ({
-        url: `${this.baseUrl}/product/${product.id}`,
-        lastmod: product.updatedAt?.toISOString().split('T')[0] || new Date().toISOString().split('T')[0],
-        changefreq: 'weekly' as const,
-        priority: 0.7
-      })),
-      // Blog posts
-      ...blogPosts.filter(p => p.status === 'published').map(post => ({
-        url: `${this.baseUrl}/blog/${post.id}`,
-        lastmod: post.updatedAt?.toISOString().split('T')[0] || new Date().toISOString().split('T')[0],
-        changefreq: 'monthly' as const,
-        priority: 0.6
-      })),
-      // Blog index
-      {
-        url: `${this.baseUrl}/blog`,
-        lastmod: new Date().toISOString().split('T')[0],
-        changefreq: 'daily',
-        priority: 0.8
+  generateSitemap(products: Product[], blogPosts: BlogPost[], categories: Category[]) {
+    const baseUrl = 'https://bozorcha.uz';
+    let sitemap = `<?xml version="1.0" encoding="UTF-8"?>
+<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9"
+        xmlns:xhtml="http://www.w3.org/1999/xhtml">
+  
+  <!-- Homepage -->
+  <url>
+    <loc>${baseUrl}/</loc>
+    <xhtml:link rel="alternate" hreflang="uz" href="${baseUrl}/?lang=uz"/>
+    <xhtml:link rel="alternate" hreflang="ru" href="${baseUrl}/?lang=ru"/>
+    <lastmod>${new Date().toISOString()}</lastmod>
+    <changefreq>daily</changefreq>
+    <priority>1.0</priority>
+  </url>
+  
+  <!-- Categories -->`;
+    
+    categories.forEach(category => {
+      sitemap += `
+  <url>
+    <loc>${baseUrl}/?category=${category.slug}</loc>
+    <xhtml:link rel="alternate" hreflang="uz" href="${baseUrl}/?category=${category.slug}&amp;lang=uz"/>
+    <xhtml:link rel="alternate" hreflang="ru" href="${baseUrl}/?category=${category.slug}&amp;lang=ru"/>
+    <lastmod>${category.createdAt}</lastmod>
+    <changefreq>weekly</changefreq>
+    <priority>0.8</priority>
+  </url>`;
+    });
+    
+    // Products
+    sitemap += `\n  <!-- Products -->`;
+    products.forEach(product => {
+      if (product.isActive) {
+        sitemap += `
+  <url>
+    <loc>${baseUrl}/product/${product.id}</loc>
+    <xhtml:link rel="alternate" hreflang="uz" href="${baseUrl}/product/${product.id}?lang=uz"/>
+    <xhtml:link rel="alternate" hreflang="ru" href="${baseUrl}/product/${product.id}?lang=ru"/>
+    <lastmod>${product.updatedAt}</lastmod>
+    <changefreq>weekly</changefreq>
+    <priority>0.7</priority>
+  </url>`;
       }
-    ];
-
-    const xml = `<?xml version="1.0" encoding="UTF-8"?>
-<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">
-${entries.map(entry => `  <url>
-    <loc>${entry.url}</loc>
-    <lastmod>${entry.lastmod}</lastmod>
-    <changefreq>${entry.changefreq}</changefreq>
-    <priority>${entry.priority}</priority>
-  </url>`).join('\n')}
-</urlset>`;
-
-    return xml;
+    });
+    
+    // Blog posts
+    sitemap += `\n  <!-- Blog Posts -->`;
+    blogPosts.forEach(post => {
+      if (post.status === 'published') {
+        sitemap += `
+  <url>
+    <loc>${baseUrl}/blog/${post.id}</loc>
+    <xhtml:link rel="alternate" hreflang="uz" href="${baseUrl}/blog/${post.id}?lang=uz"/>
+    <xhtml:link rel="alternate" hreflang="ru" href="${baseUrl}/blog/${post.id}?lang=ru"/>
+    <lastmod>${post.updatedAt}</lastmod>
+    <changefreq>monthly</changefreq>
+    <priority>0.6</priority>
+  </url>`;
+      }
+    });
+    
+    sitemap += `\n</urlset>`;
+    return sitemap;
   }
 
   // Generate robots.txt
-  generateRobotsTxt(): string {
+  generateRobotsTxt() {
     return `User-agent: *
 Allow: /
 
-# Sitemap
-Sitemap: ${this.baseUrl}/sitemap.xml
+# Sitemaps
+Sitemap: https://bozorcha.uz/sitemap.xml
+
+# Crawl delay for better server performance
+Crawl-delay: 1
 
 # Block admin areas
-Disallow: /admin/
-Disallow: /api/admin/
+Disallow: /admin
+Disallow: /api/admin
 
-# Block placeholder images
-Disallow: /api/placeholder/
+# Block temporary/test files
+Disallow: /*?test=
+Disallow: /*?debug=
 
-# Crawl delay
-Crawl-delay: 1`;
+# Allow all other content
+Allow: /product/
+Allow: /blog/
+Allow: /api/placeholder/`;
   }
 
-  // Analyze page performance for SEO
-  analyzePage(content: string, metadata: SeoMetadata): {
-    score: number;
-    issues: string[];
-    suggestions: string[];
-  } {
-    const issues: string[] = [];
-    const suggestions: string[] = [];
-    let score = 100;
+  // Analyze page SEO
+  analyzePage(content: string, metadata: any) {
+    const analysis = {
+      score: 0,
+      issues: [] as string[],
+      suggestions: [] as string[]
+    };
 
-    // Title length check
-    if (metadata.title.length < 30) {
-      issues.push("Sarlavha juda qisqa (30 belgidan kam)");
-      score -= 10;
-    } else if (metadata.title.length > 60) {
-      issues.push("Sarlavha juda uzun (60 belgidan ko'p)");
-      score -= 10;
+    // Title analysis
+    if (!metadata.title) {
+      analysis.issues.push("Sarlavha (title) yo'q");
+    } else {
+      if (metadata.title.length < 20) {
+        analysis.issues.push("Sarlavha juda qisqa (20 belgidan kam)");
+      } else if (metadata.title.length > 70) {
+        analysis.issues.push("Sarlavha juda uzun (70 belgidan ko'p)");
+      } else {
+        analysis.score += 20;
+      }
     }
 
-    // Description length check
-    if (metadata.description.length < 120) {
-      issues.push("Meta tavsif juda qisqa (120 belgidan kam)");
-      score -= 10;
-    } else if (metadata.description.length > 160) {
-      issues.push("Meta tavsif juda uzun (160 belgidan ko'p)");
-      score -= 10;
+    // Description analysis
+    if (!metadata.description) {
+      analysis.issues.push("Meta tavsif yo'q");
+    } else {
+      if (metadata.description.length < 120) {
+        analysis.issues.push("Meta tavsif juda qisqa (120 belgidan kam)");
+      } else if (metadata.description.length > 160) {
+        analysis.issues.push("Meta tavsif juda uzun (160 belgidan ko'p)");
+      } else {
+        analysis.score += 20;
+      }
     }
 
-    // Keywords check
-    if (metadata.keywords.length < 3) {
-      issues.push("Kalit so'zlar etarli emas (3 tadan kam)");
-      score -= 5;
-    }
-
-    // Content length check
+    // Content analysis
     const wordCount = content.split(/\s+/).length;
     if (wordCount < 300) {
-      issues.push("Kontent juda qisqa (300 so'zdan kam)");
-      score -= 15;
-    }
-
-    // H1 tag check
-    if (!content.includes('<h1>')) {
-      issues.push("H1 tegi yo'q");
-      score -= 10;
-    }
-
-    // Image alt text check
-    const imgTags = content.match(/<img[^>]*>/g) || [];
-    const imagesWithoutAlt = imgTags.filter(img => !img.includes('alt='));
-    if (imagesWithoutAlt.length > 0) {
-      issues.push(`${imagesWithoutAlt.length} ta rasmda alt matn yo'q`);
-      score -= 5 * imagesWithoutAlt.length;
-    }
-
-    // Suggestions
-    if (score > 90) {
-      suggestions.push("SEO optimizatsiya ajoyib!");
-    } else if (score > 70) {
-      suggestions.push("Yaxshi natija, kichik yaxshilanishlar mumkin");
+      analysis.issues.push(`Kontent juda qisqa (${wordCount} so'z, kamida 300 kerak)`);
     } else {
-      suggestions.push("SEO ni yaxshilash talab qilinadi");
+      analysis.score += 20;
     }
 
-    return {
-      score: Math.max(0, score),
-      issues,
-      suggestions
-    };
+    // Keywords analysis
+    if (!metadata.keywords || metadata.keywords.length === 0) {
+      analysis.issues.push("Kalit so'zlar ko'rsatilmagan");
+    } else {
+      analysis.score += 15;
+      
+      // Check if keywords are in title and description
+      const hasKeywordInTitle = metadata.keywords.some((kw: string) => 
+        metadata.title?.toLowerCase().includes(kw.toLowerCase())
+      );
+      
+      const hasKeywordInDescription = metadata.keywords.some((kw: string) => 
+        metadata.description?.toLowerCase().includes(kw.toLowerCase())
+      );
+      
+      if (hasKeywordInTitle) analysis.score += 10;
+      if (hasKeywordInDescription) analysis.score += 10;
+    }
+
+    // Generate suggestions
+    if (analysis.score < 40) {
+      analysis.suggestions.push("Sarlavha va meta tavsifni kalit so'zlar bilan boyiting");
+    }
+    
+    if (analysis.score < 60) {
+      analysis.suggestions.push("Kontentga ko'proq kalit so'zlarni tabiiy ravishda qo'shing");
+    }
+    
+    analysis.suggestions.push("H1, H2, H3 teglarini to'g'ri ishlating");
+    analysis.suggestions.push("Ichki havolalar (internal links) qo'shing");
+    analysis.suggestions.push("Rasmlar uchun alt atributlarini qo'shing");
+    analysis.suggestions.push("Sahifa yuklanish tezligini yaxshilang");
+
+    return analysis;
   }
 }
 
+// Export singleton instance
 export const seoService = new SeoService();

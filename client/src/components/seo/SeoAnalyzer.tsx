@@ -45,26 +45,37 @@ export function SeoAnalyzer() {
 
     setIsAnalyzing(true);
     try {
+      // Get auth token from localStorage if user is authenticated
+      const authToken = localStorage.getItem('admin_token') || 'admin-token-123';
+      
       const response = await fetch('/api/admin/seo/analyze', {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
-          'Authorization': 'Bearer admin-token-123'
+          'Authorization': `Bearer ${authToken}`
         },
         body: JSON.stringify({ content, metadata })
       });
 
       if (!response.ok) {
+        if (response.status === 401) {
+          throw new Error('Avtorizatsiya xatosi');
+        }
         throw new Error('SEO tahlil xatosi');
       }
 
       const result = await response.json();
       setAnalysis(result);
+      
+      toast({
+        title: "Muvaffaqiyatli",
+        description: "SEO tahlil yakunlandi"
+      });
     } catch (error) {
       toast({
         variant: "destructive",
         title: "Xato",
-        description: "SEO tahlil qilishda xato yuz berdi"
+        description: error instanceof Error ? error.message : "SEO tahlil qilishda xato yuz berdi"
       });
     } finally {
       setIsAnalyzing(false);

@@ -405,33 +405,42 @@ export class MemoryStorage implements IStorage {
   }
 
   private initializeWithSampleData() {
-    // Add sample categories
+    // Add sample categories (bilingual)
     const electronics = {
       id: "mem_cat_1",
-      name: "Elektronika",
+      name: "Elektronika / Электроника",
       slug: "elektronika",
-      description: "Zamonaviy elektronika mahsulotlari",
+      description: "Zamonaviy elektronika mahsulotlari / Современная электроника",
       isActive: true,
       createdAt: new Date(),
     };
 
     const fashion = {
       id: "mem_cat_2", 
-      name: "Kiyim-kechak",
+      name: "Kiyim-kechak / Одежда",
       slug: "kiyim-kechak",
-      description: "Zamonaviy kiyim va aksessuarlar",
+      description: "Zamonaviy kiyim va aksessuarlar / Современная одежда и аксессуары",
       isActive: true,
       createdAt: new Date(),
     };
 
-    this.categories.push(electronics, fashion);
+    const appliances = {
+      id: "mem_cat_3", 
+      name: "Uy jihozlari / Бытовая техника",
+      slug: "uy-jihozlari",
+      description: "Uy uchun jihozlar / Техника для дома",
+      isActive: true,
+      createdAt: new Date(),
+    };
+
+    this.categories.push(electronics, fashion, appliances);
 
     // Add sample products
     const sampleProducts: Product[] = [
       {
         id: "mem_prod_1",
-        name: "Samsung Galaxy S24",
-        description: "Zamonaviy smartfon yuqori sifat va tezkor ishlash bilan",
+        name: "Samsung Galaxy S24 / Самсунг Галакси С24",
+        description: "Zamonaviy smartfon yuqori sifat va tezkor ishlash bilan / Современный смартфон с высоким качеством и быстрой работой",
         price: "8999000",
         category: "elektronika",
         images: [
@@ -441,9 +450,9 @@ export class MemoryStorage implements IStorage {
         ],
         youtubeUrl: "https://www.youtube.com/watch?v=dQw4w9WgXcQ",
         stock: 15,
-        metaTitle: "Samsung Galaxy S24 - Zamonaviy Smartfon | Bozorcha",
-        metaDescription: "Samsung Galaxy S24 smartfonini arzon narxda sotib oling. Yuqori sifat, tezkor ishlash va zamonaviy dizayn.",
-        keywords: ["smartfon", "samsung", "galaxy", "telefon"],
+        metaTitle: "Samsung Galaxy S24 - Zamonaviy Smartfon | Современный Смартфон | Bozorcha",
+        metaDescription: "Samsung Galaxy S24 smartfonini arzon narxda sotib oling. Купите Samsung Galaxy S24 по доступной цене. Yuqori sifat va zamonaviy dizayn.",
+        keywords: ["smartfon", "samsung", "galaxy", "telefon", "смартфон", "телефон", "гэлэкси"],
         rating: "4.8",
         reviewCount: 124,
         isActive: true,

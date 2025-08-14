@@ -6,12 +6,15 @@ import { Input } from "@/components/ui/input";
 import { Sheet, SheetContent, SheetTrigger } from "@/components/ui/sheet";
 import { useCart } from "@/components/cart-context";
 import { useWishlist } from "@/components/wishlist-context";
+import { LanguageSwitcher } from "@/components/LanguageSwitcher";
+import { useLanguage } from "@/contexts/LanguageContext";
 
 export function Header() {
   const [location, navigate] = useLocation();
   const [searchQuery, setSearchQuery] = useState("");
   const { getCartItemsCount } = useCart();
   const { wishlist } = useWishlist();
+  const { t, language } = useLanguage();
   
   const cartCount = getCartItemsCount();
   const wishlistCount = wishlist.length;
@@ -23,13 +26,13 @@ export function Header() {
   };
 
   const categories = [
-    { name: "Barcha kategoriyalar", href: "/" },
-    { name: "Elektronika", href: "/?category=elektronika" },
-    { name: "Kiyim", href: "/?category=kiyim" },
-    { name: "Uy jihozlari", href: "/?category=uy-jihozlari" },
-    { name: "Kitoblar", href: "/?category=kitoblar" },
-    { name: "Sport", href: "/?category=sport" },
-    { name: "Go'zallik", href: "/?category=gozallik" },
+    { name: t('categories'), href: "/" },
+    { name: t('electronics'), href: "/?category=elektronika" },
+    { name: t('clothing'), href: "/?category=kiyim" },
+    { name: t('appliances'), href: "/?category=uy-jihozlari" },
+    { name: t('books'), href: "/?category=kitoblar" },
+    { name: t('sports'), href: "/?category=sport" },
+    { name: t('beauty'), href: "/?category=gozallik" },
   ];
 
   return (
@@ -42,7 +45,9 @@ export function Header() {
               <Link href="/" data-testid="logo-link">
                 <h1 className="text-2xl font-bold text-primary">Bozorcha</h1>
               </Link>
-              <span className="ml-2 text-xs bg-secondary text-white px-2 py-1 rounded-full">UZ</span>
+              <span className="ml-2 text-xs bg-secondary text-white px-2 py-1 rounded-full">
+                {language.toUpperCase()}
+              </span>
             </div>
 
             {/* Search Bar - Desktop */}
@@ -50,7 +55,7 @@ export function Header() {
               <div className="relative w-full">
                 <Input
                   type="text"
-                  placeholder="Mahsulotlarni qidiring..."
+                  placeholder={t('search_placeholder')}
                   value={searchQuery}
                   onChange={(e) => setSearchQuery(e.target.value)}
                   onKeyPress={(e) => e.key === 'Enter' && handleSearch()}
@@ -63,13 +68,14 @@ export function Header() {
                   className="absolute right-2 top-1 bg-primary text-white px-4 py-1 text-sm hover:bg-blue-700"
                   data-testid="search-button"
                 >
-                  Qidirish
+                  {language === 'uz' ? 'Qidirish' : 'Поиск'}
                 </Button>
               </div>
             </div>
 
             {/* User Actions */}
-            <div className="flex items-center space-x-4">
+            <div className="flex items-center space-x-2">
+              <LanguageSwitcher />
               <Link href="/profile">
                 <Button variant="ghost" size="icon" className="relative" data-testid="wishlist-button">
                   <Heart className="h-5 w-5" />
@@ -106,7 +112,7 @@ export function Header() {
                     <div className="relative">
                       <Input
                         type="text"
-                        placeholder="Mahsulotlarni qidiring..."
+                        placeholder={t('search_placeholder')}
                         value={searchQuery}
                         onChange={(e) => setSearchQuery(e.target.value)}
                         onKeyPress={(e) => e.key === 'Enter' && handleSearch()}
@@ -118,7 +124,7 @@ export function Header() {
                         className="mt-2 w-full"
                         data-testid="mobile-search-button"
                       >
-                        Qidirish
+                        {language === 'uz' ? 'Qidirish' : 'Поиск'}
                       </Button>
                     </div>
                     {categories.map((category) => (
@@ -151,10 +157,10 @@ export function Header() {
             </div>
             <div className="flex items-center space-x-4">
               <Link href="/blog">
-                <span className="text-gray-600 hover:text-primary cursor-pointer">Blog</span>
+                <span className="text-gray-600 hover:text-primary cursor-pointer">{t('blog')}</span>
               </Link>
               <Link href="/contact">
-                <span className="text-gray-600 hover:text-primary cursor-pointer">Aloqa</span>
+                <span className="text-gray-600 hover:text-primary cursor-pointer">{t('about')}</span>
               </Link>
             </div>
           </div>
