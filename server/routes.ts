@@ -511,6 +511,29 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
+  // Admin SEO Analysis endpoint
+  app.post("/api/admin/seo/analyze", adminAuth, async (req, res) => {
+    try {
+      const { content, metadata } = req.body;
+      
+      if (!content || !metadata?.title || !metadata?.description) {
+        return res.status(400).json({ message: "Content va metadata kerak" });
+      }
+
+      // Simple SEO analysis
+      const analysis = {
+        score: calculateSeoScore(content, metadata),
+        issues: findSeoIssues(content, metadata),
+        suggestions: generateSeoSuggestions(content, metadata)
+      };
+
+      res.json(analysis);
+    } catch (error) {
+      console.error("Error analyzing SEO:", error);
+      res.status(500).json({ message: "SEO tahlil xatosi" });
+    }
+  });
+
   // Generate XML sitemap
   app.get("/sitemap.xml", async (req, res) => {
     try {
@@ -540,23 +563,65 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
-  // Admin SEO analysis
-  app.post("/api/admin/seo/analyze", adminAuth, async (req, res) => {
-    try {
-      const { content, metadata } = req.body;
-      
-      if (!content || !metadata) {
-        return res.status(400).json({ message: "Content and metadata are required" });
-      }
-
-      const analysis = seoService.analyzePage(content, metadata);
-      res.json(analysis);
-    } catch (error) {
-      console.error("Error analyzing SEO:", error);
-      res.status(500).json({ message: "Failed to analyze SEO" });
-    }
-  });
-
   const httpServer = createServer(app);
   return httpServer;
+}
+
+// SEO helper functions
+function calculateSeoScore(content: string, metadata: any): number {
+  let score = 0;
+  
+  // Title length check (20-60 characters)
+  if (metadata.title.length >= 20 && metadata.title.length <= 60) score += 20;
+  
+  // Description length check (120-160 characters)
+  if (metadata.description.length >= 120 && metadata.description.length <= 160) score += 20;
+  
+  // Content length check (minimum 300 words)
+  const wordCount = content.split(/\s+/).length;
+  if (wordCount >= 300) score += 20;
+  
+  // Keywords in title
+  if (metadata.keywords && metadata.keywords.some((kw: string) => 
+    metadata.title.toLowerCase().includes(kw.toLowerCase()))) score += 15;
+  
+  // Keywords in description
+  if (metadata.keywords && metadata.keywords.some((kw: string) => 
+    metadata.description.toLowerCase().includes(kw.toLowerCase()))) score += 15;
+  
+  // Keywords in content
+  if (metadata.keywords && metadata.keywords.some((kw: string) => 
+    content.toLowerCase().includes(kw.toLowerCase()))) score += 10;
+  
+  return score;
+}
+
+function findSeoIssues(content: string, metadata: any): string[] {
+  const issues = [];
+  
+  if (metadata.title.length < 20) issues.push("Sarlavha juda qisqa (20 ta belgidan kam)");
+  if (metadata.title.length > 60) issues.push("Sarlavha juda uzun (60 ta belgidan ko'p)");
+  if (metadata.description.length < 120) issues.push("Meta tavsif juda qisqa (120 ta belgidan kam)");
+  if (metadata.description.length > 160) issues.push("Meta tavsif juda uzun (160 ta belgidan ko'p)");
+  
+  const wordCount = content.split(/\s+/).length;
+  if (wordCount < 300) issues.push(`Kontent juda qisqa (${wordCount} so'z, kamida 300 kerak)`);
+  
+  if (!metadata.keywords || metadata.keywords.length === 0) {
+    issues.push("Kalit so'zlar ko'rsatilmagan");
+  }
+  
+  return issues;
+}
+
+function generateSeoSuggestions(content: string, metadata: any): string[] {
+  const suggestions = [];
+  
+  suggestions.push("Sarlavhaga asosiy kalit so'zni qo'shing");
+  suggestions.push("Meta tavsifni yanada jozibali qilib yozing");
+  suggestions.push("Kontentga ko'proq kalit so'zlarni tabiiy ravishda qo'shing");
+  suggestions.push("Sarlavha teglarini (H1, H2, H3) to'g'ri ishlating");
+  suggestions.push("Ichki va tashqi havolalar qo'shing");
+  
+  return suggestions;
 }

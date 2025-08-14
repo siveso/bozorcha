@@ -40,11 +40,12 @@ export default function Cart() {
     
     try {
       const orderData = {
+        orderNumber: `ORD${Date.now()}`,
         customerName: orderForm.name,
         customerPhone: orderForm.phone,
-        customerEmail: orderForm.email,
+        customerEmail: orderForm.email || "",
         customerAddress: orderForm.address,
-        notes: orderForm.notes,
+        notes: orderForm.notes || "",
         items: cart.map(item => ({
           id: item.id,
           name: item.name,
@@ -191,9 +192,19 @@ export default function Cart() {
                         <Minus className="h-4 w-4" />
                       </Button>
                       
-                      <span className="text-lg font-semibold w-8 text-center">
-                        {item.quantity}
-                      </span>
+                      <input
+                        type="number"
+                        min="1"
+                        max="999"
+                        value={item.quantity}
+                        onChange={(e) => {
+                          const newQuantity = parseInt(e.target.value) || 1;
+                          if (newQuantity >= 1 && newQuantity <= 999) {
+                            updateQuantity(item.id, newQuantity);
+                          }
+                        }}
+                        className="w-16 h-10 text-center border border-gray-300 rounded-md text-lg font-semibold focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                      />
                       
                       <Button 
                         variant="outline" 
