@@ -5,6 +5,7 @@ import {
   orders,
   trendAnalysis,
   users,
+  contactMessages,
   type Product,
   type InsertProduct,
   type BlogPost,
@@ -17,6 +18,8 @@ import {
   type InsertTrendAnalysis,
   type User,
   type InsertUser,
+  type ContactMessage,
+  type InsertContactMessage,
 } from "@shared/schema";
 import { db } from "./db";
 import { eq, desc, asc, ilike, and, gte, lte, sql, inArray } from "drizzle-orm";
@@ -76,6 +79,17 @@ export interface IStorage {
   getUser(id: string): Promise<User | undefined>;
   getUserByUsername(username: string): Promise<User | undefined>;
   createUser(user: InsertUser): Promise<User>;
+
+  // Contact Messages
+  getContactMessages(filters?: {
+    status?: string;
+    limit?: number;
+    offset?: number;
+  }): Promise<{ messages: ContactMessage[]; total: number }>;
+  getContactMessage(id: string): Promise<ContactMessage | undefined>;
+  createContactMessage(message: InsertContactMessage): Promise<ContactMessage>;
+  updateContactMessage(id: string, message: Partial<InsertContactMessage>): Promise<ContactMessage | undefined>;
+  deleteContactMessage(id: string): Promise<boolean>;
 }
 
 export class DatabaseStorage implements IStorage {
@@ -316,6 +330,57 @@ export class DatabaseStorage implements IStorage {
     return created;
   }
 
+  // Contact Messages
+  async getContactMessages(filters: {
+    status?: string;
+    limit?: number;
+    offset?: number;
+  } = {}): Promise<{ messages: ContactMessage[]; total: number }> {
+    const { status, limit = 50, offset = 0 } = filters;
+    
+    let query = db.select().from(contactMessages);
+    let countQuery = db.select({ count: sql<number>`count(*)` }).from(contactMessages);
+    
+    if (status) {
+      query = query.where(eq(contactMessages.status, status));
+      countQuery = countQuery.where(eq(contactMessages.status, status));
+    }
+    
+    const [messages, countResult] = await Promise.all([
+      query.orderBy(desc(contactMessages.createdAt)).limit(limit).offset(offset),
+      countQuery
+    ]);
+    
+    return {
+      messages,
+      total: countResult[0]?.count || 0
+    };
+  }
+
+  async getContactMessage(id: string): Promise<ContactMessage | undefined> {
+    const [message] = await db.select().from(contactMessages).where(eq(contactMessages.id, id));
+    return message;
+  }
+
+  async createContactMessage(message: InsertContactMessage): Promise<ContactMessage> {
+    const [created] = await db.insert(contactMessages).values(message).returning();
+    return created;
+  }
+
+  async updateContactMessage(id: string, message: Partial<InsertContactMessage>): Promise<ContactMessage | undefined> {
+    const [updated] = await db
+      .update(contactMessages)
+      .set({ ...message, updatedAt: new Date() })
+      .where(eq(contactMessages.id, id))
+      .returning();
+    return updated;
+  }
+
+  async deleteContactMessage(id: string): Promise<boolean> {
+    const result = await db.delete(contactMessages).where(eq(contactMessages.id, id));
+    return result.rowCount > 0;
+  }
+
   // Categories
   async updateCategory(id: string, category: Partial<InsertCategory>): Promise<Category | undefined> {
     const [updated] = await db
@@ -398,6 +463,7 @@ export class MemoryStorage implements IStorage {
   private orders: Order[] = [];
   private trendAnalyses: TrendAnalysis[] = [];
   private users: User[] = [];
+  private contactMessages: ContactMessage[] = [];
   private nextId = 1;
 
   constructor() {
@@ -901,6 +967,67 @@ export class MemoryStorage implements IStorage {
     };
     this.users.push(newUser);
     return newUser;
+  }
+
+  // Contact Messages
+  async getContactMessages(filters: {
+    status?: string;
+    limit?: number;
+    offset?: number;
+  } = {}): Promise<{ messages: ContactMessage[]; total: number }> {
+    const { status, limit = 50, offset = 0 } = filters;
+    
+    let filteredMessages = this.contactMessages;
+    
+    if (status) {
+      filteredMessages = filteredMessages.filter(m => m.status === status);
+    }
+    
+    // Sort by createdAt desc
+    filteredMessages.sort((a, b) => b.createdAt.getTime() - a.createdAt.getTime());
+    
+    return {
+      messages: filteredMessages.slice(offset, offset + limit),
+      total: filteredMessages.length
+    };
+  }
+
+  async getContactMessage(id: string): Promise<ContactMessage | undefined> {
+    return this.contactMessages.find(m => m.id === id);
+  }
+
+  async createContactMessage(message: InsertContactMessage): Promise<ContactMessage> {
+    const now = new Date();
+    const newMessage: ContactMessage = {
+      ...message,
+      id: this.generateId(),
+      status: message.status || "unread",
+      createdAt: now,
+      updatedAt: now,
+    };
+    this.contactMessages.push(newMessage);
+    return newMessage;
+  }
+
+  async updateContactMessage(id: string, message: Partial<InsertContactMessage>): Promise<ContactMessage | undefined> {
+    const index = this.contactMessages.findIndex(m => m.id === id);
+    if (index === -1) return undefined;
+    
+    const updatedMessage = {
+      ...this.contactMessages[index],
+      ...message,
+      updatedAt: new Date(),
+    };
+    this.contactMessages[index] = updatedMessage;
+    return updatedMessage;
+  }
+
+  async deleteContactMessage(id: string): Promise<boolean> {
+    const index = this.contactMessages.findIndex(m => m.id === id);
+    if (index === -1) return false;
+    
+    this.contactMessages.splice(index, 1);
+    return true;
   }
 }
 

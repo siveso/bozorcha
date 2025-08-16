@@ -120,6 +120,22 @@ export const users = pgTable("users", {
   createdAt: timestamp("created_at").defaultNow(),
 });
 
+// Contact messages table
+export const contactMessages = pgTable("contact_messages", {
+  id: varchar("id").primaryKey().default(sql`gen_random_uuid()`),
+  name: text("name").notNull(),
+  email: text("email").notNull(),
+  subject: text("subject").notNull(),
+  message: text("message").notNull(),
+  status: varchar("status").notNull().default("unread"), // "unread" | "read" | "replied"
+  adminNotes: text("admin_notes"),
+  createdAt: timestamp("created_at").defaultNow(),
+  updatedAt: timestamp("updated_at").defaultNow(),
+}, (table) => [
+  index("idx_contact_messages_status").on(table.status),
+  index("idx_contact_messages_created").on(table.createdAt),
+]);
+
 // Relations
 export const productsRelations = relations(products, ({ one }) => ({
   category: one(categories, {
@@ -160,6 +176,12 @@ export const insertUserSchema = createInsertSchema(users).omit({
   createdAt: true,
 });
 
+export const insertContactMessageSchema = createInsertSchema(contactMessages).omit({
+  id: true,
+  createdAt: true,
+  updatedAt: true,
+});
+
 // Insert schemas
 export const insertOrderSchema = createInsertSchema(orders).omit({
   id: true,
@@ -185,3 +207,6 @@ export type InsertTrendAnalysis = z.infer<typeof insertTrendAnalysisSchema>;
 
 export type User = typeof users.$inferSelect;
 export type InsertUser = z.infer<typeof insertUserSchema>;
+
+export type ContactMessage = typeof contactMessages.$inferSelect;
+export type InsertContactMessage = z.infer<typeof insertContactMessageSchema>;

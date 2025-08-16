@@ -5,11 +5,12 @@ import { ProductManagement } from "@/components/admin/product-management";
 import { BlogManagement } from "@/components/admin/blog-management";
 import { OrderManagement } from "@/components/admin/order-management";
 import { CategoryManagement } from "@/components/admin/category-management";
+import { ContactManagement } from "@/components/admin/contact-management";
 import { TrendAnalysisComponent } from "@/components/admin/trend-analysis";
 import { SeoAnalyzer } from "@/components/seo/SeoAnalyzer";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
-import { Box, Newspaper, TrendingUp, Search, ShoppingBag, Folder } from "lucide-react";
+import { Box, Newspaper, TrendingUp, Search, ShoppingBag, Folder, MessageSquare } from "lucide-react";
 import { useLanguage } from "@/contexts/LanguageContext";
 import { LanguageSwitcher } from "@/components/LanguageSwitcher";
 
@@ -89,7 +90,7 @@ export default function Admin() {
       {/* Admin Content */}
       <div className="p-6">
         <Tabs defaultValue="products" className="w-full">
-          <TabsList className="grid w-full grid-cols-6">
+          <TabsList className="grid w-full grid-cols-7">
             <TabsTrigger value="products" className="flex items-center gap-2" data-testid="products-tab">
               <Box className="h-4 w-4" />
               {t('products_management')}
@@ -109,6 +110,10 @@ export default function Admin() {
             <TabsTrigger value="trends" className="flex items-center gap-2" data-testid="trends-tab">
               <TrendingUp className="h-4 w-4" />
               {t('trends_analysis')}
+            </TabsTrigger>
+            <TabsTrigger value="contact" className="flex items-center gap-2" data-testid="contact-tab">
+              <MessageSquare className="h-4 w-4" />
+              {language === 'ru' ? 'Сообщения' : 'Xabarlar'}
             </TabsTrigger>
             <TabsTrigger value="seo" className="flex items-center gap-2" data-testid="seo-tab">
               <Search className="h-4 w-4" />
@@ -134,6 +139,10 @@ export default function Admin() {
 
           <TabsContent value="trends" className="mt-6">
             <TrendAnalysisComponent />
+          </TabsContent>
+
+          <TabsContent value="contact" className="mt-6">
+            <ContactManagement />
           </TabsContent>
 
           <TabsContent value="seo" className="mt-6">

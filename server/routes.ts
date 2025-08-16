@@ -4,6 +4,7 @@ import { storage } from "./storage";
 import { geminiService } from "./services/gemini";
 import { seoService } from "./services/seo";
 import { sendEmail } from "./email";
+import { insertContactMessageSchema } from "@shared/schema";
 import { insertProductSchema, insertBlogPostSchema, insertCategorySchema, insertOrderSchema } from "@shared/schema";
 import { z } from "zod";
 
@@ -573,13 +574,22 @@ export async function registerRoutes(app: Express): Promise<Server> {
         return res.status(400).json({ message: "Barcha maydonlar to'ldirilishi shart" });
       }
 
-      // Development mode: Always simulate successful submission
-      console.log("=== ALOQA FORMASI XABARI ===");
+      // Save contact message to database
+      const contactMessage = await storage.createContactMessage({
+        name,
+        email,
+        subject,
+        message,
+        status: "unread"
+      });
+      
+      console.log("=== ALOQA FORMASI XABARI SAQLANDI ===");
+      console.log(`ID: ${contactMessage.id}`);
       console.log(`Ism: ${name}`);
       console.log(`Email: ${email}`);
       console.log(`Mavzu: ${subject}`);
       console.log(`Xabar: ${message}`);
-      console.log("===========================");
+      console.log("=====================================");
       
       // Try to send email if configured, but don't fail if not
       try {
@@ -602,12 +612,70 @@ export async function registerRoutes(app: Express): Promise<Server> {
         console.log("Email yuborilmadi, lekin xabar saqlandi");
       }
       
-      // Always return success in development
       res.json({ message: "Rahmat! Xabaringiz qabul qilindi. Tez orada javob beramiz." });
       
     } catch (error) {
       console.error("Contact form error:", error);
       res.status(500).json({ message: "Xatolik yuz berdi. Qayta urinib ko'ring." });
+    }
+  });
+
+  // Contact Messages Admin Routes
+  app.get("/api/admin/contact-messages", adminAuth, async (req, res) => {
+    try {
+      const { status, limit, offset } = req.query;
+      const result = await storage.getContactMessages({
+        status: status as string,
+        limit: limit ? parseInt(limit as string) : undefined,
+        offset: offset ? parseInt(offset as string) : undefined,
+      });
+      res.json(result);
+    } catch (error) {
+      console.error("Error fetching contact messages:", error);
+      res.status(500).json({ message: "Failed to fetch contact messages" });
+    }
+  });
+
+  app.get("/api/admin/contact-messages/:id", adminAuth, async (req, res) => {
+    try {
+      const message = await storage.getContactMessage(req.params.id);
+      if (!message) {
+        return res.status(404).json({ message: "Contact message not found" });
+      }
+      res.json(message);
+    } catch (error) {
+      console.error("Error fetching contact message:", error);
+      res.status(500).json({ message: "Failed to fetch contact message" });
+    }
+  });
+
+  app.put("/api/admin/contact-messages/:id", adminAuth, async (req, res) => {
+    try {
+      const { status, adminNotes } = req.body;
+      const message = await storage.updateContactMessage(req.params.id, {
+        status,
+        adminNotes,
+      });
+      if (!message) {
+        return res.status(404).json({ message: "Contact message not found" });
+      }
+      res.json(message);
+    } catch (error) {
+      console.error("Error updating contact message:", error);
+      res.status(500).json({ message: "Failed to update contact message" });
+    }
+  });
+
+  app.delete("/api/admin/contact-messages/:id", adminAuth, async (req, res) => {
+    try {
+      const success = await storage.deleteContactMessage(req.params.id);
+      if (!success) {
+        return res.status(404).json({ message: "Contact message not found" });
+      }
+      res.json({ message: "Contact message deleted successfully" });
+    } catch (error) {
+      console.error("Error deleting contact message:", error);
+      res.status(500).json({ message: "Failed to delete contact message" });
     }
   });
 
