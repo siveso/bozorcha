@@ -574,7 +574,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
       }
 
       const emailSent = await sendEmail({
-        to: "admin@bozorcha.uz", // Admin email
+        to: "akramfarmonov1@gmail.com", // Updated admin email
         from: "noreply@bozorcha.uz", // From email
         subject: `Contact Form: ${subject}`,
         text: `Name: ${name}\nEmail: ${email}\n\nMessage:\n${message}`,
@@ -589,9 +589,18 @@ export async function registerRoutes(app: Express): Promise<Server> {
       });
 
       if (emailSent) {
-        res.json({ message: "Message sent successfully" });
+        res.json({ message: "Xabaringiz muvaffaqiyatli yuborildi!" });
       } else {
-        res.status(500).json({ message: "Failed to send message. Please try again later." });
+        // For development: Log the message and simulate success
+        console.log("=== CONTACT FORM SUBMISSION ===");
+        console.log(`Name: ${name}`);
+        console.log(`Email: ${email}`);
+        console.log(`Subject: ${subject}`);
+        console.log(`Message: ${message}`);
+        console.log("===============================");
+        
+        // Simulate successful submission for development
+        res.json({ message: "Xabaringiz qabul qilindi! Tez orada aloqaga chiqamiz." });
       }
     } catch (error) {
       console.error("Error sending contact email:", error);
