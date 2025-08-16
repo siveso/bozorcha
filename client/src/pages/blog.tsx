@@ -5,6 +5,7 @@ import { BlogCard } from "@/components/blog-card";
 import { BlogSearch } from "@/components/blog-search";
 import { SeoHead } from "@/components/seo/SeoHead";
 import { Button } from "@/components/ui/button";
+import { Input } from "@/components/ui/input";
 import { Card } from "@/components/ui/card";
 import { Skeleton } from "@/components/ui/skeleton";
 import { BookOpen } from "lucide-react";

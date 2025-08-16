@@ -108,8 +108,7 @@ export default function Contact() {
                     </div>
                     <div>
                       <h3 className="font-semibold text-gray-900">Telefon</h3>
-                      <p className="text-gray-600">+998 (90) 123-45-67</p>
-                      <p className="text-gray-600">+998 (91) 987-65-43</p>
+                      <p className="text-gray-600">+998 (99) 644-84-44</p>
                     </div>
                   </div>
                 </CardContent>
@@ -123,8 +122,7 @@ export default function Contact() {
                     </div>
                     <div>
                       <h3 className="font-semibold text-gray-900">Email</h3>
-                      <p className="text-gray-600">info@bozorcha.uz</p>
-                      <p className="text-gray-600">support@bozorcha.uz</p>
+                      <p className="text-gray-600">akramfarmonov1@gmail.com</p>
                     </div>
                   </div>
                 </CardContent>
@@ -139,8 +137,8 @@ export default function Contact() {
                     <div>
                       <h3 className="font-semibold text-gray-900">Manzil</h3>
                       <p className="text-gray-600">
-                        Toshkent sh., Yunusobod t.,<br />
-                        Amir Temur ko'chasi 123-uy
+                        Toshkent sh., Uchtepa tumani,<br />
+                        o'rikzor bozori
                       </p>
                     </div>
                   </div>
