@@ -3,6 +3,7 @@ import { createServer, type Server } from "http";
 import { storage } from "./storage";
 import { geminiService } from "./services/gemini";
 import { seoService } from "./services/seo";
+import { sendEmail } from "./email";
 import { insertProductSchema, insertBlogPostSchema, insertCategorySchema, insertOrderSchema } from "@shared/schema";
 import { z } from "zod";
 
@@ -560,6 +561,41 @@ export async function registerRoutes(app: Express): Promise<Server> {
     } catch (error) {
       console.error("Error generating robots.txt:", error);
       res.status(500).send("Error generating robots.txt");
+    }
+  });
+
+  // Contact form endpoint
+  app.post("/api/contact", async (req, res) => {
+    try {
+      const { name, email, subject, message } = req.body;
+      
+      if (!name || !email || !subject || !message) {
+        return res.status(400).json({ message: "All fields are required" });
+      }
+
+      const emailSent = await sendEmail({
+        to: "admin@bozorcha.uz", // Admin email
+        from: "noreply@bozorcha.uz", // From email
+        subject: `Contact Form: ${subject}`,
+        text: `Name: ${name}\nEmail: ${email}\n\nMessage:\n${message}`,
+        html: `
+          <h3>New Contact Form Submission</h3>
+          <p><strong>Name:</strong> ${name}</p>
+          <p><strong>Email:</strong> ${email}</p>
+          <p><strong>Subject:</strong> ${subject}</p>
+          <p><strong>Message:</strong></p>
+          <p>${message.replace(/\n/g, '<br>')}</p>
+        `
+      });
+
+      if (emailSent) {
+        res.json({ message: "Message sent successfully" });
+      } else {
+        res.status(500).json({ message: "Failed to send message. Please try again later." });
+      }
+    } catch (error) {
+      console.error("Error sending contact email:", error);
+      res.status(500).json({ message: "Internal server error" });
     }
   });
 

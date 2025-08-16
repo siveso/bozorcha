@@ -2,40 +2,35 @@ import { useState } from "react";
 import { useQuery } from "@tanstack/react-query";
 import { Header } from "@/components/header";
 import { BlogCard } from "@/components/blog-card";
+import { BlogSearch } from "@/components/blog-search";
 import { SeoHead } from "@/components/seo/SeoHead";
 import { Button } from "@/components/ui/button";
-import { Input } from "@/components/ui/input";
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Card } from "@/components/ui/card";
 import { Skeleton } from "@/components/ui/skeleton";
-import { Search, BookOpen } from "lucide-react";
+import { BookOpen } from "lucide-react";
 import type { BlogPost } from "@shared/schema";
 
 export default function BlogPage() {
-  const [searchQuery, setSearchQuery] = useState("");
-  const [sortBy, setSortBy] = useState("newest");
+  const [filteredPosts, setFilteredPosts] = useState<BlogPost[]>([]);
   const [currentPage, setCurrentPage] = useState(0);
   const pageSize = 9;
 
   const { data: blogData, isLoading } = useQuery({
-    queryKey: ["/api/blog", searchQuery, sortBy, currentPage],
+    queryKey: ["/api/blog"],
     queryFn: async () => {
-      const params = new URLSearchParams();
-      params.append("status", "published");
-      params.append("limit", pageSize.toString());
-      params.append("offset", (currentPage * pageSize).toString());
-      
-      const response = await fetch(`/api/blog?${params}`);
+      const response = await fetch("/api/blog?status=published&limit=100");
       return await response.json();
     },
   });
 
-  const handleSearch = () => {
-    // Search functionality can be implemented later
+  const handleFilteredPosts = (posts: BlogPost[]) => {
+    setFilteredPosts(posts);
     setCurrentPage(0);
   };
 
-  const totalPages = Math.ceil((blogData?.total || 0) / pageSize);
+  const displayPosts = filteredPosts.length > 0 ? filteredPosts : (blogData?.posts || []);
+  const paginatedPosts = displayPosts.slice(currentPage * pageSize, (currentPage + 1) * pageSize);
+  const totalPages = Math.ceil(displayPosts.length / pageSize);
 
   const seoData = {
     title: "Blog - Bozorcha",
@@ -76,39 +71,11 @@ export default function BlogPage() {
 
         {/* Search and Filter Section */}
         <section className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
-          <Card className="p-6">
-            <div className="flex flex-col md:flex-row gap-4">
-              <div className="flex-1">
-                <div className="relative">
-                  <Input
-                    type="text"
-                    placeholder="Maqolalarni qidiring..."
-                    value={searchQuery}
-                    onChange={(e) => setSearchQuery(e.target.value)}
-                    onKeyPress={(e) => e.key === 'Enter' && handleSearch()}
-                    className="pl-10"
-                    data-testid="blog-search-input"
-                  />
-                  <Search className="absolute left-3 top-3 h-4 w-4 text-gray-400" />
-                </div>
-              </div>
-              <div className="flex gap-4">
-                <Select value={sortBy} onValueChange={setSortBy}>
-                  <SelectTrigger className="w-48" data-testid="blog-sort-select">
-                    <SelectValue />
-                  </SelectTrigger>
-                  <SelectContent>
-                    <SelectItem value="newest">Yangidan eskiga</SelectItem>
-                    <SelectItem value="oldest">Eskidan yangiga</SelectItem>
-                    <SelectItem value="popular">Mashhur</SelectItem>
-                  </SelectContent>
-                </Select>
-                <Button onClick={handleSearch} data-testid="blog-search-button">
-                  Qidirish
-                </Button>
-              </div>
-            </div>
-          </Card>
+          <BlogSearch 
+            posts={blogData?.posts || []}
+            onFilteredPosts={handleFilteredPosts}
+            loading={isLoading}
+          />
         </section>
 
         {/* Blog Posts Grid */}
@@ -118,7 +85,7 @@ export default function BlogPage() {
               Barcha maqolalar
             </h2>
             <p className="text-gray-600">
-              <span data-testid="total-posts">{blogData?.total || 0}</span> ta maqola topildi
+              <span data-testid="total-posts">{displayPosts.length}</span> ta maqola topildi
             </p>
           </div>
 
@@ -139,13 +106,13 @@ export default function BlogPage() {
           ) : (
             <>
               <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
-                {blogData?.posts?.map((post: any) => (
+                {paginatedPosts.map((post: any) => (
                   <BlogCard key={post.id} post={post} />
                 ))}
               </div>
 
               {/* Empty State */}
-              {blogData?.posts?.length === 0 && (
+              {displayPosts.length === 0 && (
                 <div className="text-center py-12">
                   <BookOpen className="mx-auto h-16 w-16 text-gray-400 mb-4" />
                   <h3 className="text-lg font-medium text-gray-900 mb-2">

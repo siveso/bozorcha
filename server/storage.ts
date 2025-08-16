@@ -638,8 +638,8 @@ export class MemoryStorage implements IStorage {
       rating: product.rating || "0.0",
       reviewCount: product.reviewCount || 0,
       isActive: product.isActive ?? true,
-      images: Array.isArray(product.images) ? product.images : [],
-      keywords: Array.isArray(product.keywords) ? product.keywords : [],
+      images: Array.isArray(product.images) ? product.images as string[] : [],
+      keywords: Array.isArray(product.keywords) ? product.keywords as string[] : [],
     };
     this.products.push(newProduct);
     return newProduct;
@@ -653,8 +653,8 @@ export class MemoryStorage implements IStorage {
       ...this.products[index],
       ...product,
       updatedAt: new Date(),
-      images: Array.isArray(product.images) ? product.images : this.products[index].images,
-      keywords: Array.isArray(product.keywords) ? product.keywords : this.products[index].keywords,
+      images: Array.isArray(product.images) ? product.images as string[] : this.products[index].images,
+      keywords: Array.isArray(product.keywords) ? product.keywords as string[] : this.products[index].keywords,
     };
     return this.products[index];
   }
@@ -741,6 +741,7 @@ export class MemoryStorage implements IStorage {
       createdAt: now,
       updatedAt: now,
       status: order.status || "pending",
+      customerEmail: order.customerEmail || null,
     };
     this.orders.push(newOrder);
     return newOrder;
@@ -804,8 +805,8 @@ export class MemoryStorage implements IStorage {
       id: this.generateId(),
       createdAt: now,
       updatedAt: now,
-      tags: Array.isArray(post.tags) ? post.tags : [],
-      trendingKeywords: Array.isArray(post.trendingKeywords) ? post.trendingKeywords : [],
+      tags: Array.isArray(post.tags) ? post.tags as string[] : [],
+      trendingKeywords: Array.isArray(post.trendingKeywords) ? post.trendingKeywords as string[] : [],
       status: post.status || "draft",
       createdBy: post.createdBy || "admin",
       readTime: post.readTime || 5,
@@ -823,8 +824,8 @@ export class MemoryStorage implements IStorage {
       ...this.blogPosts[index],
       ...post,
       updatedAt: new Date(),
-      tags: Array.isArray(post.tags) ? post.tags : this.blogPosts[index].tags,
-      trendingKeywords: Array.isArray(post.trendingKeywords) ? post.trendingKeywords : this.blogPosts[index].trendingKeywords,
+      tags: Array.isArray(post.tags) ? post.tags as string[] : this.blogPosts[index].tags,
+      trendingKeywords: Array.isArray(post.trendingKeywords) ? post.trendingKeywords as string[] : this.blogPosts[index].trendingKeywords,
     };
     return this.blogPosts[index];
   }
@@ -869,7 +870,7 @@ export class MemoryStorage implements IStorage {
       generatedPosts: analysis.generatedPosts || 0,
       successfulPosts: analysis.successfulPosts || 0,
       failedPosts: analysis.failedPosts || 0,
-      errors: Array.isArray(analysis.errors) ? analysis.errors : [],
+      errors: Array.isArray(analysis.errors) ? analysis.errors as string[] : [],
     };
     this.trendAnalyses.push(newAnalysis);
     return newAnalysis;

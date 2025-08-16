@@ -22,16 +22,39 @@ export default function Contact() {
     e.preventDefault();
     setIsSubmitting(true);
     
-    // Simulate form submission
-    await new Promise(resolve => setTimeout(resolve, 1000));
-    
-    toast({
-      title: "Xabar yuborildi!",
-      description: "Sizning xabaringiz muvaffaqiyatli yuborildi. Tez orada javob beramiz."
-    });
-    
-    setFormData({ name: "", email: "", subject: "", message: "" });
-    setIsSubmitting(false);
+    try {
+      const response = await fetch("/api/contact", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify(formData),
+      });
+
+      const data = await response.json();
+
+      if (response.ok) {
+        toast({
+          title: "Xabar yuborildi!",
+          description: "Sizning xabaringiz muvaffaqiyatli yuborildi. Tez orada javob beramiz."
+        });
+        setFormData({ name: "", email: "", subject: "", message: "" });
+      } else {
+        toast({
+          title: "Xatolik yuz berdi",
+          description: data.message || "Xabar yuborishda xatolik yuz berdi. Qayta urinib ko'ring.",
+          variant: "destructive"
+        });
+      }
+    } catch (error) {
+      toast({
+        title: "Xatolik yuz berdi",
+        description: "Internet aloqasi yoki server bilan bog'liq muammo. Qayta urinib ko'ring.",
+        variant: "destructive"
+      });
+    } finally {
+      setIsSubmitting(false);
+    }
   };
 
   const handleChange = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) => {

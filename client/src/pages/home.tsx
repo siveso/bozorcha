@@ -6,6 +6,8 @@ import { Header } from "@/components/header";
 import { ProductFilters } from "@/components/product-filters";
 import { ProductCard } from "@/components/product-card";
 import { BlogCard } from "@/components/blog-card";
+import { Testimonials } from "@/components/testimonials";
+import { Newsletter } from "@/components/newsletter";
 import { SeoHead } from "@/components/seo/SeoHead";
 import { Button } from "@/components/ui/button";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
@@ -342,6 +344,12 @@ export default function Home() {
             </div>
           </div>
         </section>
+
+        {/* Testimonials Section */}
+        <Testimonials />
+
+        {/* Newsletter Section */}
+        <Newsletter />
 
         {/* Footer */}
         <footer className="bg-gray-900 text-white py-12">
