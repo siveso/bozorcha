@@ -18,6 +18,7 @@ import { z } from "zod";
 export const products = pgTable("products", {
   id: varchar("id").primaryKey().default(sql`gen_random_uuid()`),
   name: text("name").notNull(),
+  slug: varchar("slug").notNull().unique(),
   description: text("description").notNull(),
   price: decimal("price", { precision: 10, scale: 2 }).notNull(),
   category: varchar("category").notNull(),
@@ -36,6 +37,7 @@ export const products = pgTable("products", {
   index("idx_products_category").on(table.category),
   index("idx_products_price").on(table.price),
   index("idx_products_active").on(table.isActive),
+  index("idx_products_slug").on(table.slug),
 ]);
 
 // Blog posts table

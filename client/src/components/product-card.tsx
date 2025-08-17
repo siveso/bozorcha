@@ -39,7 +39,7 @@ export function ProductCard({ product, onAddToCart, onAddToWishlist }: ProductCa
   };
 
   return (
-    <Link href={`/product/${product.id}`}>
+    <Link href={`/product/${product.slug || product.id}`}>
       <Card className="overflow-hidden hover:shadow-lg transition-shadow cursor-pointer" data-testid={`product-card-${product.id}`}>
         <div className="aspect-square overflow-hidden">
           {product.images.length > 0 && !imageError ? (

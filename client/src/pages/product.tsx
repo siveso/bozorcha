@@ -22,9 +22,10 @@ export default function ProductPage() {
   const { toast } = useToast();
 
   const { data: product, isLoading, error } = useQuery({
-    queryKey: ["/api/products", productId],
+    queryKey: ["/api/products/slug", productId],
     queryFn: async () => {
-      const response = await fetch(`/api/products/${productId}`);
+      // Try to fetch by slug first
+      const response = await fetch(`/api/products/slug/${productId}`);
       if (!response.ok) {
         throw new Error("Product not found");
       }

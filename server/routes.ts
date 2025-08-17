@@ -121,7 +121,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
-  // Get single product
+  // Get single product by ID (for admin)
   app.get("/api/products/:id", async (req, res) => {
     try {
       const product = await storage.getProduct(req.params.id);
@@ -131,6 +131,20 @@ export async function registerRoutes(app: Express): Promise<Server> {
       res.json(product);
     } catch (error) {
       console.error("Error fetching product:", error);
+      res.status(500).json({ message: "Failed to fetch product" });
+    }
+  });
+
+  // Get single product by slug (for public)
+  app.get("/api/products/slug/:slug", async (req, res) => {
+    try {
+      const product = await storage.getProductBySlug(req.params.slug);
+      if (!product) {
+        return res.status(404).json({ message: "Product not found" });
+      }
+      res.json(product);
+    } catch (error) {
+      console.error("Error fetching product by slug:", error);
       res.status(500).json({ message: "Failed to fetch product" });
     }
   });

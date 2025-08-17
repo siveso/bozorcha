@@ -21,6 +21,7 @@ import {
   type ContactMessage,
   type InsertContactMessage,
 } from "@shared/schema";
+import { createSlug, generateUniqueSlug } from "@shared/utils";
 import { db } from "./db";
 import { eq, desc, asc, ilike, and, gte, lte, sql, inArray } from "drizzle-orm";
 
@@ -36,6 +37,7 @@ export interface IStorage {
     offset?: number;
   }): Promise<{ products: Product[]; total: number }>;
   getProduct(id: string): Promise<Product | undefined>;
+  getProductBySlug(slug: string): Promise<Product | undefined>;
   createProduct(product: InsertProduct): Promise<Product>;
   updateProduct(id: string, product: Partial<InsertProduct>): Promise<Product | undefined>;
   deleteProduct(id: string): Promise<boolean>;
@@ -503,11 +505,12 @@ export class MemoryStorage implements IStorage {
 
     this.categories.push(electronics, fashion, appliances);
 
-    // Add sample products
+    // Add sample products with slugs
     const sampleProducts: Product[] = [
       {
         id: "mem_prod_1",
         name: "Samsung Galaxy S24 / Самсунг Галакси С24",
+        slug: "samsung-galaxy-s24",
         description: "Zamonaviy smartfon yuqori sifat va tezkor ishlash bilan / Современный смартфон с высоким качеством и быстрой работой",
         price: "8999000",
         category: "elektronika",
@@ -530,6 +533,7 @@ export class MemoryStorage implements IStorage {
       {
         id: "mem_prod_2",
         name: "Zamonaviy Ko'ylak",
+        slug: "zamonaviy-koylak",
         description: "Yumshoq va qulay mato bilan tayyorlangan erkaklar uchun zamonaviy ko'ylak",
         price: "189000",
         category: "kiyim-kechak",
@@ -552,6 +556,7 @@ export class MemoryStorage implements IStorage {
       {
         id: "mem_prod_3",
         name: "Noutbuk HP Pavilion",
+        slug: "noutbuk-hp-pavilion",
         description: "Ishchi va o'quvchilar uchun mukammal noutbuk - tezkor ishlash va uzun batareya umri",
         price: "5499000",
         category: "elektronika",
@@ -574,6 +579,33 @@ export class MemoryStorage implements IStorage {
     ];
 
     this.products.push(...sampleProducts);
+
+    // Add sample product with special ID that matches the one in the image
+    const specialProduct: Product = {
+      id: "mem_35",
+      name: "Mysop urnalari — 50/65 litr",
+      slug: "mysop-urnalari-50-65-litr",
+      description: "Yuqori sifatli plastik mysop urnalari, turli xil ranglarda mavjud. Uy va ofis uchun ideal tanlov.",
+      price: "4000",
+      category: "uy-jihozlari",
+      images: [
+        "/api/placeholder/400/400",
+        "/api/placeholder/400/300",
+        "/api/placeholder/300/400"
+      ],
+      youtubeUrl: "",
+      stock: 150,
+      metaTitle: "Mysop urnalari 50/65 litr - Bozorcha",
+      metaDescription: "Sifatli mysop urnalarini arzon narxda sotib oling. 50 va 65 litrlik hajmlarda mavjud.",
+      keywords: ["mysop", "urna", "plastik", "uy jihozlari"],
+      rating: "4.2",
+      reviewCount: 47,
+      isActive: true,
+      createdAt: new Date(),
+      updatedAt: new Date(),
+    };
+
+    this.products.push(specialProduct);
 
     // Add sample blog posts
     const sampleBlogPosts: BlogPost[] = [
@@ -701,11 +733,23 @@ export class MemoryStorage implements IStorage {
     return this.products.find(p => p.id === id);
   }
 
+  async getProductBySlug(slug: string): Promise<Product | undefined> {
+    return this.products.find(p => p.slug === slug);
+  }
+
   async createProduct(product: InsertProduct): Promise<Product> {
     const now = new Date();
+    
+    // Generate slug if not provided
+    const slug = product.slug || generateUniqueSlug(
+      product.name, 
+      this.products.map(p => p.slug)
+    );
+    
     const newProduct: Product = {
       ...product,
       id: this.generateId(),
+      slug,
       createdAt: now,
       updatedAt: now,
       rating: product.rating || "0.0",
