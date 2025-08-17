@@ -18,6 +18,8 @@ import Contact from "@/pages/contact";
 import Services from "@/pages/services";
 import Profile from "@/pages/profile";
 import Cart from "@/pages/cart";
+import Login from "@/pages/login";
+import Register from "@/pages/register";
 import NotFound from "@/pages/not-found";
 
 function Router() {
@@ -35,6 +37,8 @@ function Router() {
       <Route path="/services" component={Services} />
       <Route path="/profile" component={Profile} />
       <Route path="/cart" component={Cart} />
+      <Route path="/login" component={Login} />
+      <Route path="/register" component={Register} />
       <Route component={NotFound} />
     </Switch>
   );

@@ -3,8 +3,9 @@ import { createServer, type Server } from "http";
 import { storage } from "./storage";
 import { geminiService } from "./services/gemini";
 import { seoService } from "./services/seo";
+import { autoBlogService } from "./services/auto-blog";
 import { sendEmail } from "./email";
-import { insertContactMessageSchema } from "@shared/schema";
+import { insertContactMessageSchema, insertUserSchema } from "@shared/schema";
 import { insertProductSchema, insertBlogPostSchema, insertCategorySchema, insertOrderSchema } from "@shared/schema";
 import { z } from "zod";
 
@@ -19,6 +20,74 @@ const adminAuth = (req: any, res: any, next: any) => {
 };
 
 export async function registerRoutes(app: Express): Promise<Server> {
+  // Authentication routes
+  app.post("/api/auth/register", async (req, res) => {
+    try {
+      const userData = insertUserSchema.parse(req.body);
+      
+      // Check if user already exists
+      const existingUser = await storage.getUserByEmail(userData.email);
+      if (existingUser) {
+        return res.status(400).json({ message: "Email allaqachon ro'yxatdan o'tgan" });
+      }
+      
+      // Create user
+      const user = await storage.createUser({
+        ...userData,
+        emailVerified: false,
+        verificationToken: Math.random().toString(36).substring(2, 15),
+      });
+      
+      // Send verification email (simulated)
+      console.log(`Verification email sent to ${user.email}`);
+      
+      res.json({ 
+        message: "Ro'yxatdan o'tish muvaffaqiyatli yakunlandi",
+        userId: user.id,
+        emailSent: true
+      });
+    } catch (error: any) {
+      console.error("Registration error:", error);
+      res.status(400).json({ message: error.message || "Ro'yxatdan o'tishda xatolik" });
+    }
+  });
+
+  app.post("/api/auth/login", async (req, res) => {
+    try {
+      const { email, password } = req.body;
+      
+      if (!email || !password) {
+        return res.status(400).json({ message: "Email va parol kiritilishi shart" });
+      }
+      
+      const user = await storage.getUserByEmail(email);
+      if (!user || user.password !== password) {
+        return res.status(401).json({ message: "Email yoki parol noto'g'ri" });
+      }
+      
+      if (!user.isActive) {
+        return res.status(401).json({ message: "Hisob bloklangan" });
+      }
+      
+      // Generate simple token (in production, use JWT)
+      const token = `user_${user.id}_${Date.now()}`;
+      
+      res.json({
+        token,
+        user: {
+          id: user.id,
+          fullName: user.fullName,
+          email: user.email,
+          role: user.role,
+          emailVerified: user.emailVerified
+        }
+      });
+    } catch (error: any) {
+      console.error("Login error:", error);
+      res.status(500).json({ message: "Kirish xatoligi" });
+    }
+  });
+
   // Public API routes
   
   // Get all products with filtering
@@ -678,6 +747,55 @@ export async function registerRoutes(app: Express): Promise<Server> {
       res.status(500).json({ message: "Failed to delete contact message" });
     }
   });
+
+  // Auto-blog service routes
+  app.post("/api/admin/auto-blog/start", adminAuth, async (req, res) => {
+    try {
+      autoBlogService.start();
+      res.json({ message: "Avtomatik blog yaratish tizimi ishga tushirildi" });
+    } catch (error) {
+      console.error("Error starting auto-blog service:", error);
+      res.status(500).json({ message: "Tizimni ishga tushirishda xatolik" });
+    }
+  });
+
+  app.post("/api/admin/auto-blog/stop", adminAuth, async (req, res) => {
+    try {
+      autoBlogService.stop();
+      res.json({ message: "Avtomatik blog yaratish tizimi to'xtatildi" });
+    } catch (error) {
+      console.error("Error stopping auto-blog service:", error);
+      res.status(500).json({ message: "Tizimni to'xtatishda xatolik" });
+    }
+  });
+
+  app.get("/api/admin/auto-blog/status", adminAuth, async (req, res) => {
+    try {
+      const status = autoBlogService.getStatus();
+      res.json(status);
+    } catch (error) {
+      console.error("Error getting auto-blog status:", error);
+      res.status(500).json({ message: "Status olishda xatolik" });
+    }
+  });
+
+  app.post("/api/admin/auto-blog/generate", adminAuth, async (req, res) => {
+    try {
+      const { count = 5 } = req.body;
+      const result = await autoBlogService.generatePosts(count);
+      res.json({
+        message: `${result.success} ta post yaratildi, ${result.failed} ta xatolik`,
+        ...result
+      });
+    } catch (error) {
+      console.error("Error generating posts:", error);
+      res.status(500).json({ message: "Post yaratishda xatolik" });
+    }
+  });
+
+  // Start auto-blog service automatically
+  console.log("Starting auto-blog service...");
+  autoBlogService.start();
 
   const httpServer = createServer(app);
   return httpServer;

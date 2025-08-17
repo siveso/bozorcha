@@ -110,15 +110,23 @@ export const trendAnalysis = pgTable("trend_analysis", {
   index("idx_trend_analysis_date").on(table.date),
 ]);
 
-// Users table for admin auth
+// Users table for registration and admin auth
 export const users = pgTable("users", {
   id: varchar("id").primaryKey().default(sql`gen_random_uuid()`),
-  username: text("username").notNull().unique(),
+  fullName: text("full_name").notNull(),
+  email: text("email").notNull().unique(),
+  phone: text("phone").notNull(),
   password: text("password").notNull(),
-  role: varchar("role").notNull().default("admin"),
+  role: varchar("role").notNull().default("user"), // "user" | "admin"
   isActive: boolean("is_active").default(true),
+  emailVerified: boolean("email_verified").default(false),
+  verificationToken: text("verification_token"),
   createdAt: timestamp("created_at").defaultNow(),
-});
+  updatedAt: timestamp("updated_at").defaultNow(),
+}, (table) => [
+  index("idx_users_email").on(table.email),
+  index("idx_users_phone").on(table.phone),
+]);
 
 // Contact messages table
 export const contactMessages = pgTable("contact_messages", {
@@ -174,6 +182,7 @@ export const insertTrendAnalysisSchema = createInsertSchema(trendAnalysis).omit(
 export const insertUserSchema = createInsertSchema(users).omit({
   id: true,
   createdAt: true,
+  updatedAt: true,
 });
 
 export const insertContactMessageSchema = createInsertSchema(contactMessages).omit({

@@ -78,7 +78,9 @@ export interface IStorage {
   // Users
   getUser(id: string): Promise<User | undefined>;
   getUserByUsername(username: string): Promise<User | undefined>;
+  getUserByEmail(email: string): Promise<User | undefined>;
   createUser(user: InsertUser): Promise<User>;
+  updateUser(id: string, user: Partial<InsertUser>): Promise<User | undefined>;
 
   // Contact Messages
   getContactMessages(filters?: {
@@ -614,11 +616,16 @@ export class MemoryStorage implements IStorage {
     // Create admin user
     this.users.push({
       id: "mem_user_1",
-      username: "admin",
+      fullName: "Admin User",
+      email: "admin@bozorcha.uz",
+      phone: "+998901234567",
       password: "admin123", // In production, this should be hashed
       role: "admin",
       isActive: true,
+      emailVerified: true,
+      verificationToken: null,
       createdAt: new Date(),
+      updatedAt: new Date(),
     });
 
     this.nextId = 10; // Start IDs from 10 to avoid conflicts
@@ -1028,6 +1035,47 @@ export class MemoryStorage implements IStorage {
     
     this.contactMessages.splice(index, 1);
     return true;
+  }
+
+  // Users - new auth methods
+  async getUser(id: string): Promise<User | undefined> {
+    return this.users.find(u => u.id === id);
+  }
+
+  async getUserByUsername(username: string): Promise<User | undefined> {
+    return this.users.find(u => u.email === username); // Use email as username
+  }
+
+  async getUserByEmail(email: string): Promise<User | undefined> {
+    return this.users.find(u => u.email === email);
+  }
+
+  async createUser(user: InsertUser): Promise<User> {
+    const now = new Date();
+    const newUser: User = {
+      ...user,
+      id: this.generateId(),
+      role: user.role || "user",
+      isActive: user.isActive ?? true,
+      emailVerified: user.emailVerified ?? false,
+      createdAt: now,
+      updatedAt: now,
+    };
+    this.users.push(newUser);
+    return newUser;
+  }
+
+  async updateUser(id: string, user: Partial<InsertUser>): Promise<User | undefined> {
+    const index = this.users.findIndex(u => u.id === id);
+    if (index === -1) return undefined;
+    
+    const updatedUser = {
+      ...this.users[index],
+      ...user,
+      updatedAt: new Date(),
+    };
+    this.users[index] = updatedUser;
+    return updatedUser;
   }
 }
 
