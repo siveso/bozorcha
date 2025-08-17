@@ -53,8 +53,16 @@ export class AutoBlogService {
       let trendAnalysis = existingAnalysis;
       if (!trendAnalysis) {
         console.log("Generating trend analysis...");
-        trendAnalysis = await geminiService.generateTrendAnalysis();
-        await storage.createTrendAnalysis(trendAnalysis);
+        const analysisResult = await geminiService.analyzeDailyTrends();
+        const analysis = {
+          date: today,
+          trends: analysisResult.trends,
+          generatedPosts: 0,
+          successfulPosts: 0,
+          failedPosts: 0,
+          errors: []
+        };
+        trendAnalysis = await storage.createTrendAnalysis(analysis);
       }
 
       const targetPosts = 12;
