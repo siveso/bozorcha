@@ -98,18 +98,15 @@ export class AutoBlogService {
       for (let i = 0; i < postsToGenerate; i++) {
         try {
           const topic = topics[Math.floor(Math.random() * topics.length)];
-          const randomKeywords = trendAnalysis.trends
-            .sort(() => 0.5 - Math.random())
-            .slice(0, 3)
-            .map(t => t.keyword);
+          const randomKeywords = Array.isArray(trendAnalysis.trends) ? 
+            trendAnalysis.trends
+              .sort(() => 0.5 - Math.random())
+              .slice(0, 3)
+              .map(t => t.keyword) : [];
 
           console.log(`Generating post ${i + 1}: ${topic}`);
           
-          const blogPost = await geminiService.generateBlogPost({
-            topic,
-            keywords: randomKeywords,
-            trends: trendAnalysis.trends
-          });
+          const blogPost = await geminiService.generateBlogPost(topic, trendAnalysis.trends || []);
 
           const postData: InsertBlogPost = {
             title: blogPost.title,

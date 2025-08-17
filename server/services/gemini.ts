@@ -172,7 +172,7 @@ JSON formatida javob bering:
         metaTitle: data.metaTitle,
         metaDescription: data.metaDescription,
         tags: data.tags,
-        trendingKeywords: trends.map(t => t.keyword),
+        trendingKeywords: Array.isArray(trends) ? trends.map(t => t.keyword) : [],
         readTime: data.readTime,
         createdBy: "auto",
         status: "published",
